@@ -245,6 +245,7 @@ body::before{content:"";position:fixed;inset:0;background-image:radial-gradient(
     <div class="nav-links">
       <button class="nav-btn" id="nav-home" onclick="goPage('home')">ดูดวง</button>
       <button class="nav-btn" id="nav-history" onclick="goPage('history')">ประวัติ</button>
+      <button class="nav-btn" onclick="openSettings()" title="ตั้งค่า GAS URL" style="padding:6px 12px;font-size:1rem">⚙</button>
       <button class="nav-refresh" onclick="refreshPage()" title="รีเฟรช">↺</button>
     </div>
   </div>
@@ -484,7 +485,11 @@ const DM_COLORS={
 
 /* ── APP STATE ──────────────────────────────────── */
 let currentResult=null, radarChart=null, countdownInt=null, histPage=1;
-const PER_PAGE=20, GAS_URL="YOUR_GAS_URL_HERE";
+const PER_PAGE=20;
+// GAS URL stored in localStorage so admin can configure via UI
+function getGasUrl(){return localStorage.getItem("soulElementGasUrl")||"";}
+function setGasUrl(u){localStorage.setItem("soulElementGasUrl",u.trim());}
+function hasGas(){const u=getGasUrl();return u&&u.startsWith("https://");}
 
 /* ── PAGE ROUTING ───────────────────────────────── */
 function goPage(n){
@@ -955,9 +960,55 @@ function saveLocal(r){try{let h=getLocal().filter(x=>x.id!==r.id);h.unshift(r);i
 function getLocal(){try{return JSON.parse(localStorage.getItem("baziHistory")||"[]");}catch(e){return[];}}
 function delLocal(id){try{localStorage.setItem("baziHistory",JSON.stringify(getLocal().filter(r=>r.id!==id)));}catch(e){}}
 
-/* ── GAS ────────────────────────────────────────── */
-async function saveGAS(r){if(!GAS_URL||GAS_URL==="YOUR_GAS_URL_HERE")return;await fetch(GAS_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"saveResult",data:r})});}
-async function delGAS(id){if(!GAS_URL||GAS_URL==="YOUR_GAS_URL_HERE")return;await fetch(GAS_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"deleteResult",id})});}
+/* ── GAS FUNCTIONS ──────────────────────────────── */
+async function saveGAS(r){
+  if(!hasGas())return;
+  const url=getGasUrl();
+  try{
+    // Try CORS mode first (requires GAS doPost to return proper headers)
+    const res=await fetch(url+"?nocache="+Date.now(),{
+      method:"POST",
+      headers:{"Content-Type":"text/plain"},
+      body:JSON.stringify({action:"saveResult",data:r})
+    });
+    if(!res.ok)throw new Error("non-ok");
+  }catch(e){
+    // Fallback no-cors (fire-and-forget, no response reading)
+    try{await fetch(url,{method:"POST",mode:"no-cors",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({action:"saveResult",data:r})});}catch(e2){}
+  }
+}
+
+async function delGAS(id){
+  if(!hasGas())return;
+  const url=getGasUrl();
+  try{await fetch(url,{method:"POST",mode:"no-cors",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({action:"deleteResult",id})});}catch(e){}
+}
+
+async function getFromGAS(id){
+  if(!hasGas())return null;
+  const url=getGasUrl();
+  try{
+    const res=await fetch(url+"?action=getResult&id="+encodeURIComponent(id)+"&nocache="+Date.now());
+    if(!res.ok)return null;
+    const data=await res.json();
+    return data&&data.id?data:null;
+  }catch(e){return null;}
+}
+
+async function getHistoryFromGAS(){
+  if(!hasGas())return [];
+  const url=getGasUrl();
+  try{
+    const res=await fetch(url+"?action=getHistory&nocache="+Date.now());
+    if(!res.ok)return [];
+    const data=await res.json();
+    return Array.isArray(data)?data:[];
+  }catch(e){return [];}
+}
 
 /* ── RECENT ─────────────────────────────────────── */
 function renderRecent(){
@@ -1039,11 +1090,57 @@ function drawSlip(r){
 function downloadSlip(){const c=document.getElementById("slip-canvas"),a=document.createElement("a");a.href=c.toDataURL("image/png");a.download="soul-element-slip.png";a.click();}
 
 /* ── SHARED LINK ────────────────────────────────── */
-function checkSharedLink(){
-  const id=new URLSearchParams(window.location.search).get("id");if(!id)return;
-  const r=getLocal().find(x=>x.id===id);
-  if(r){currentResult=r;renderResult(r);goPage("result");setTimeout(()=>{const ar=document.querySelector(".action-row");if(ar)ar.style.display="none";},200);}
-  else Swal.fire({title:"<span style=\"color:#B5281C\">ไม่พบข้อมูล</span>",html:"<span style=\"color:#888\">ลิงก์อาจหมดอายุแล้ว</span>",background:"#fff",customClass:{popup:"swal-cn"},icon:"warning"});
+function hideActionRowForShared(){
+  setTimeout(()=>{
+    const ar=document.querySelector(".action-row");
+    if(ar)ar.style.display="none";
+    // Also hide refresh btn
+    const rb=document.querySelector(".nav-refresh");
+    if(rb)rb.style.display="none";
+  },200);
+}
+
+async function checkSharedLink(){
+  const id=new URLSearchParams(window.location.search).get("id");
+  if(!id)return;
+
+  // 1. Check localStorage first (fast)
+  const local=getLocal().find(x=>x.id===id);
+  if(local){
+    currentResult=local;renderResult(local);goPage("result");
+    hideActionRowForShared();return;
+  }
+
+  // 2. Show loading while fetching from GAS
+  Swal.fire({
+    title:"<span style=\"color:#B5281C;font-family:'Ma Shan Zheng',serif\">กำลังโหลดข้อมูล...</span>",
+    html:"<div style=\"color:#888;font-size:0.84rem\">ดึงข้อมูลจากระบบ กรุณารอสักครู่</div>",
+    allowOutsideClick:false,showConfirmButton:false,background:"#fff",
+    customClass:{popup:"swal-cn"},didOpen:()=>Swal.showLoading()
+  });
+
+  try{
+    const gasResult=await getFromGAS(id);
+    Swal.close();
+    if(gasResult){
+      saveLocal(gasResult); // cache locally for next time
+      currentResult=gasResult;renderResult(gasResult);goPage("result");
+      hideActionRowForShared();
+    }else{
+      // 3. Not found anywhere
+      Swal.fire({
+        title:"<span style=\"color:#B5281C\">ไม่พบข้อมูล</span>",
+        html:"<div style=\"color:#888;font-size:0.88rem\">ลิงก์นี้หมดอายุหรือไม่มีในระบบ<br><span style=\"font-size:0.8rem;color:#bbb\">ID: "+id+"</span></div>",
+        background:"#fff",customClass:{popup:"swal-cn"},icon:"warning",
+        confirmButtonColor:"#B5281C"
+      });
+    }
+  }catch(e){
+    Swal.close();
+    Swal.fire({title:"<span style=\"color:#B5281C\">เชื่อมต่อไม่ได้</span>",
+      html:"<div style=\"color:#888;font-size:0.88rem\">ไม่สามารถดึงข้อมูลจาก GAS ได้<br>กรุณาตรวจสอบ GAS URL ในการตั้งค่า</div>",
+      background:"#fff",customClass:{popup:"swal-cn"},icon:"error",confirmButtonColor:"#B5281C"});
+  }
 }
 
 /* ── FORM HELPERS ───────────────────────────────── */
@@ -1058,6 +1155,64 @@ function fmtDate(d){if(!d)return"—";const dt=new Date(d+"T00:00:00");return dt
 function toast2(type,msg){Swal.fire({toast:true,position:"top-end",showConfirmButton:false,timer:2500,timerProgressBar:true,title:(type==="success"?"✅":"❌")+" "+msg,background:"#fff",color:"#333",customClass:{popup:"swal-cn"}});}
 // EL_ICON already declared above
 
+/* ── SETTINGS FUNCTIONS ─────────────────────────── */
+function openSettings(){
+  const modal=document.getElementById("settings-modal");
+  modal.classList.add("open");
+  const input=document.getElementById("gas-url-input");
+  input.value=getGasUrl();
+  updateCurrentGasStatus();
+}
+function closeSettings(){document.getElementById("settings-modal").classList.remove("open");}
+
+function updateCurrentGasStatus(){
+  const el=document.getElementById("current-gas-status");
+  if(!el)return;
+  const url=getGasUrl();
+  if(url&&url.startsWith("https://")){
+    el.innerHTML=`<span style="color:#2e7d32">✅ ตั้งค่าแล้ว</span><br><span style="color:#999;font-size:0.75rem;word-break:break-all">${url.substring(0,60)}...</span>`;
+  }else{
+    el.innerHTML=`<span style="color:#B5281C">❌ ยังไม่ได้ตั้งค่า GAS URL</span><br><span style="color:#999;font-size:0.75rem">ข้อมูลจะบันทึกเฉพาะใน Browser นี้เท่านั้น</span>`;
+  }
+}
+
+function saveGasUrl(){
+  const val=document.getElementById("gas-url-input").value.trim();
+  const statusEl=document.getElementById("gas-status");
+  if(!val){
+    statusEl.innerHTML="<span style='color:#B5281C'>กรุณากรอก URL</span>";return;
+  }
+  if(!val.startsWith("https://script.google.com")){
+    statusEl.innerHTML="<span style='color:#B5281C'>URL ต้องขึ้นต้นด้วย https://script.google.com</span>";return;
+  }
+  setGasUrl(val);
+  statusEl.innerHTML="<span style='color:#2e7d32'>✅ บันทึก URL สำเร็จ!</span>";
+  updateCurrentGasStatus();
+  setTimeout(()=>closeSettings(),1200);
+}
+
+async function testGasUrl(){
+  const val=document.getElementById("gas-url-input").value.trim();
+  const statusEl=document.getElementById("gas-status");
+  if(!val){statusEl.innerHTML="<span style='color:#B5281C'>กรุณากรอก URL ก่อน</span>";return;}
+  statusEl.innerHTML="<span style='color:#888'>⏳ กำลังทดสอบ...</span>";
+  try{
+    const res=await fetch(val+"?action=ping&nocache="+Date.now(),{method:"GET"});
+    if(res.ok){
+      const txt=await res.text();
+      if(txt.includes("pong")||txt.includes("ok")||txt.includes("{")){
+        statusEl.innerHTML="<span style='color:#2e7d32'>✅ เชื่อมต่อสำเร็จ! GAS พร้อมใช้งาน</span>";
+      }else{
+        statusEl.innerHTML="<span style='color:#FF8C00'>⚠️ เชื่อมต่อได้แต่ response ผิดปกติ ลองบันทึกและใช้งานได้เลย</span>";
+      }
+    }else{
+      statusEl.innerHTML=`<span style='color:#B5281C'>❌ เชื่อมต่อไม่ได้ (status ${res.status})</span>`;
+    }
+  }catch(e){
+    statusEl.innerHTML=`<span style='color:#B5281C'>❌ ${e.message.includes("CORS")?"CORS error — GAS ต้องตั้งค่า Access: Anyone":e.message}</span>`;
+  }
+}
+
 /* ── INIT ───────────────────────────────────────── */
 document.addEventListener("DOMContentLoaded",()=>{
   // Version check: clear old incompatible data
@@ -1067,8 +1222,53 @@ document.addEventListener("DOMContentLoaded",()=>{
     localStorage.setItem("baziVer",VER);
   }
   document.getElementById("inp-date").valueAsDate=new Date();
-  goPage("home");checkSharedLink();
+  goPage("home");
+  // checkSharedLink is async - call it properly
+  checkSharedLink().catch(()=>{});
+  // Show GAS config reminder if not set and no ?id param
+  const hasId=new URLSearchParams(window.location.search).get("id");
+  if(!hasGas()&&!hasId){
+    // Show subtle indicator in home page
+    const gasHint=document.createElement("div");
+    gasHint.style.cssText="text-align:center;margin-top:14px;font-size:0.78rem;color:#bbb";
+    gasHint.innerHTML=`<span>⚙ GAS ยังไม่ได้ตั้งค่า — ข้อมูลจะไม่ sync ข้าม Browser 
+      <button onclick="openSettings()" style="color:#B5281C;background:none;border:none;cursor:pointer;font-size:0.78rem;font-weight:700;text-decoration:underline">ตั้งค่าเลย</button></span>`;
+    document.getElementById("recent-section")?.parentElement?.appendChild(gasHint);
+  }
 });
 </script>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-ov" id="settings-modal">
+  <div class="modal-box" style="width:480px">
+    <div class="modal-hdr">
+      <span class="modal-tit">⚙ ตั้งค่าระบบ GAS URL</span>
+      <button class="modal-cls" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="modal-bdy" style="padding:24px">
+      <div style="font-size:0.82rem;color:#555;margin-bottom:16px;line-height:1.7;background:#fef9f5;border:1px solid #f0e0c0;border-radius:10px;padding:14px">
+        <b style="color:#B5281C">วิธีตั้งค่า:</b><br>
+        1. เปิด Google Apps Script → Deploy → Web App<br>
+        2. ตั้งค่า <b>Execute as: Me</b> และ <b>Access: Anyone</b><br>
+        3. คัดลอก URL ที่ได้มาวางด้านล่าง<br>
+        4. กด "บันทึก" เพื่อเริ่มใช้งาน
+      </div>
+      <label style="font-size:0.78rem;font-weight:700;color:#B5281C;letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:7px">Google Apps Script URL</label>
+      <input type="url" id="gas-url-input" placeholder="https://script.google.com/macros/s/.../exec"
+        style="width:100%;padding:11px 14px;border:1.5px solid #ddd;border-radius:9px;font-size:0.88rem;font-family:'Noto Sans Thai',sans-serif;outline:none;transition:border-color 0.2s"
+        onfocus="this.style.borderColor='#B5281C'" onblur="this.style.borderColor='#ddd'"/>
+      <div id="gas-status" style="margin-top:10px;font-size:0.8rem;min-height:20px"></div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button onclick="testGasUrl()" class="bsm bsm-out" style="flex:1">🔍 ทดสอบการเชื่อมต่อ</button>
+        <button onclick="saveGasUrl()" class="bsm bsm-red" style="flex:1">💾 บันทึก URL</button>
+      </div>
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid #f0e8e8">
+        <div style="font-size:0.75rem;font-weight:700;color:#888;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px">สถานะปัจจุบัน</div>
+        <div id="current-gas-status" style="font-size:0.83rem;color:#555"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
