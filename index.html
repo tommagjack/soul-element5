@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Soul Element — ปาจื้อดูดวง</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;700&family=Noto+Serif+SC:wght@400;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{
+  --red:#B5281C;--red2:#D93025;--red3:#7B1A12;
+  --red-light:#F9DEDD;--red-pale:#FEF6F5;
+  --white:#FFFFFF;--bg:#F5F0EC;
+  --black:#1C1C1C;--gray:#5A5A5A;--gray-lt:#9A9A9A;--gray-bd:#DEDEDE;
+  --wood:#3D7A4B;--fire:#C0392B;--earth:#9C7A2E;--metal:#8B7355;--water:#2C5282;
+  --wood-bg:#EBF5ED;--fire-bg:#FDECEA;--earth-bg:#FDF5E0;--metal-bg:#F5F0E8;--water-bg:#EBF0FA;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--black);font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;min-height:100vh;overflow-x:hidden;}
+
+/* BG PATTERN */
+body::before{content:"";position:fixed;inset:0;background-image:radial-gradient(ellipse 80% 35% at 50% 0%,rgba(181,40,28,0.07) 0%,transparent 60%),url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='rgba(181,40,28,0.04)' stroke-width='1'%3E%3Crect x='8' y='8' width='64' height='64'/%3E%3Crect x='20' y='20' width='40' height='40'/%3E%3Ccircle cx='40' cy='40' r='20'/%3E%3C/g%3E%3C/svg%3E");pointer-events:none;z-index:0;}
+
+/* NAVBAR */
+#navbar{position:fixed;top:0;left:0;right:0;z-index:200;background:var(--red);border-bottom:3px solid var(--red3);box-shadow:0 2px 16px rgba(181,40,28,0.3);}
+.nav-inner{max-width:1080px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:56px;}
+.logo{font-family:"Ma Shan Zheng",serif;font-size:1.4rem;color:#fff;display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo-zh{font-size:1.6rem;opacity:0.9;}
+.logo-sub{font-size:0.67rem;color:rgba(255,255,255,0.65);font-family:"Noto Sans SC",sans-serif;letter-spacing:0.12em;display:block;margin-top:-3px;}
+.nav-links{display:flex;gap:5px;align-items:center;}
+.nav-btn{padding:6px 16px;border-radius:6px;font-size:0.81rem;font-weight:600;cursor:pointer;border:1.5px solid rgba(255,255,255,0.35);background:transparent;color:rgba(255,255,255,0.88);font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;transition:all 0.18s;}
+.nav-btn:hover,.nav-btn.active{background:#fff;color:var(--red);border-color:#fff;}
+.nav-refresh{padding:6px 10px;border-radius:6px;font-size:0.9rem;cursor:pointer;border:1.5px solid rgba(255,255,255,0.35);background:transparent;color:rgba(255,255,255,0.88);transition:all 0.18s;display:flex;align-items:center;}
+.nav-refresh:hover{background:#fff;color:var(--red);}
+
+/* PAGES */
+.page{display:none;min-height:calc(100vh - 56px);padding-top:56px;position:relative;z-index:1;}
+.page.active{display:block;}
+#page-home.active{display:flex;align-items:flex-start;justify-content:center;padding:60px 20px 60px;}
+
+/* HOME */
+.home-wrap{width:100%;max-width:600px;padding-top:16px;}
+.hero-badge{display:inline-flex;align-items:center;gap:7px;background:var(--red-light);color:var(--red3);padding:5px 15px;border-radius:20px;font-size:0.76rem;font-weight:700;letter-spacing:0.08em;margin-bottom:14px;border:1px solid rgba(181,40,28,0.2);}
+.hero-title{font-family:"Ma Shan Zheng",serif;font-size:clamp(2.2rem,7vw,3.6rem);color:var(--red);line-height:1.1;margin-bottom:4px;}
+.hero-title span{color:var(--black);}
+.hero-sub{color:var(--gray-lt);font-size:0.86rem;margin-bottom:28px;font-family:"Noto Serif SC",serif;letter-spacing:0.12em;}
+.form-card{background:#fff;border:1px solid var(--gray-bd);border-radius:18px;box-shadow:0 4px 28px rgba(181,40,28,0.07),0 1px 4px rgba(0,0,0,0.04);padding:28px;position:relative;overflow:hidden;}
+.form-card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--red3),var(--red),var(--red2));}
+.form-sec{font-size:0.67rem;font-weight:700;letter-spacing:0.18em;color:var(--red);text-transform:uppercase;margin:18px 0 11px;padding-bottom:7px;border-bottom:1.5px solid var(--red-light);display:flex;align-items:center;gap:6px;}
+.form-sec:first-of-type{margin-top:0;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.fg{margin-bottom:12px;}
+.fl{display:block;font-size:0.77rem;font-weight:600;color:var(--gray);margin-bottom:5px;}
+.fi{width:100%;background:#fff;border:1.5px solid var(--gray-bd);border-radius:9px;padding:10px 13px;color:var(--black);font-size:0.91rem;font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;transition:border-color 0.18s,box-shadow 0.18s;outline:none;appearance:none;}
+.fi:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(181,40,28,0.1);}
+.fi:disabled{background:#f5f5f5;opacity:0.55;cursor:not-allowed;}
+.cbrow{display:flex;align-items:center;gap:7px;margin-top:7px;}
+.cbrow input[type=checkbox]{accent-color:var(--red);width:15px;height:15px;cursor:pointer;}
+.cbrow label{font-size:0.81rem;color:var(--gray-lt);cursor:pointer;}
+.tag-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px;}
+.tc{padding:4px 13px;border-radius:20px;font-size:0.76rem;font-weight:600;border:1.5px solid var(--gray-bd);background:#fff;color:var(--gray);cursor:pointer;transition:all 0.14s;}
+.tc:hover{border-color:var(--red);color:var(--red);}
+.tc.sel{border-color:var(--red);color:#fff;background:var(--red);}
+.btn-row{display:grid;grid-template-columns:1fr 2.3fr;gap:11px;margin-top:24px;}
+.btn{padding:13px 18px;border-radius:10px;font-size:0.92rem;font-weight:700;cursor:pointer;border:none;font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;transition:all 0.18s;display:flex;align-items:center;justify-content:center;gap:7px;}
+.btn-outline{background:#fff;color:var(--gray);border:1.5px solid var(--gray-bd);}
+.btn-outline:hover{border-color:var(--red);color:var(--red);}
+.btn-red{background:linear-gradient(135deg,var(--red3),var(--red));color:#fff;box-shadow:0 4px 14px rgba(181,40,28,0.28);}
+.btn-red:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(181,40,28,0.36);}
+.recent-sec{margin-top:22px;}
+.recent-lbl{font-size:0.69rem;font-weight:700;letter-spacing:0.15em;color:var(--red);text-transform:uppercase;margin-bottom:10px;}
+.recent-list{display:flex;flex-wrap:wrap;gap:8px;}
+.recent-btn{display:flex;align-items:center;gap:8px;padding:8px 15px;border-radius:10px;border:1.5px solid;background:#fff;cursor:pointer;font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;font-size:0.82rem;color:var(--black);font-weight:600;transition:all 0.15s;}
+.recent-btn-zh{font-family:"Noto Serif SC",serif;font-size:1.1rem;}
+
+/* RESULT */
+#page-result{background:var(--bg);padding:66px 16px 60px;}
+.result-wrap{max-width:900px;margin:0 auto;}
+
+/* RESULT HEADER */
+.result-header{background:#fff;border:1px solid var(--gray-bd);border-radius:18px;padding:24px 28px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,0.05);position:relative;overflow:hidden;}
+.result-header::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--red3),var(--red),var(--red2));}
+.result-header-row{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.result-name{font-family:"Ma Shan Zheng",serif;font-size:1.8rem;color:var(--red);line-height:1.2;margin-bottom:5px;}
+.result-meta{display:flex;flex-wrap:wrap;gap:10px;color:var(--gray);font-size:0.83rem;}
+.mi{display:flex;align-items:center;gap:5px;}
+.rtag{display:inline-block;padding:2px 9px;border-radius:12px;font-size:0.7rem;font-weight:700;background:var(--red-light);color:var(--red3);border:1px solid rgba(181,40,28,0.2);margin-right:4px;}
+.dm-badge{display:inline-flex;align-items:center;gap:9px;background:var(--red);color:#fff;padding:9px 17px;border-radius:11px;font-size:0.84rem;font-weight:700;white-space:nowrap;flex-shrink:0;}
+.dm-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:"Noto Serif SC",serif;font-size:1.25rem;background:rgba(255,255,255,0.22);}
+.cdown{background:var(--red-light);border:1px solid rgba(181,40,28,0.2);border-radius:9px;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;margin-top:14px;font-size:0.81rem;}
+.cdown-lbl{color:var(--red3);font-weight:600;}
+.cdown-timer{font-family:"Noto Serif SC","Noto Sans SC",monospace;font-size:1rem;color:var(--red);font-weight:700;letter-spacing:0.04em;}
+
+/* ACTIONS */
+.action-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+.abtn{padding:8px 16px;border-radius:8px;font-size:0.79rem;font-weight:700;cursor:pointer;border:1.5px solid var(--gray-bd);background:#fff;color:var(--gray);font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;transition:all 0.14s;display:flex;align-items:center;gap:6px;}
+.abtn:hover{border-color:var(--red);color:var(--red);background:var(--red-pale);}
+.abtn-back{border-color:var(--red);color:var(--red);background:var(--red-pale);}
+.abtn-back:hover{background:var(--red);color:#fff;}
+
+/* CARDS */
+.scard{background:#fff;border:1px solid var(--gray-bd);border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 1px 6px rgba(0,0,0,0.04);}
+.stitle{font-size:0.69rem;font-weight:700;letter-spacing:0.16em;color:var(--red);text-transform:uppercase;margin-bottom:15px;display:flex;align-items:center;gap:8px;}
+.stitle::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(181,40,28,0.3),transparent);}
+
+/* PILLARS TABLE - like reference image 2 */
+.pillars-table{width:100%;border-radius:14px;overflow:hidden;border:2px solid var(--red);}
+.pillars-header{display:grid;background:var(--red);}
+.ph-cell{padding:10px 6px;text-align:center;color:#fff;font-size:0.78rem;font-weight:700;font-family:"Noto Serif SC","Noto Sans SC",sans-serif;border-right:1px solid rgba(255,255,255,0.2);}
+.ph-cell:last-child{border-right:none;}
+.ph-cell .zh-lbl{font-size:1rem;display:block;margin-bottom:1px;}
+.pillars-body{display:grid;}
+.pb-row{display:grid;border-top:1.5px solid var(--red-light);}
+.pb-cell{padding:14px 8px;text-align:center;border-right:1.5px solid var(--red-light);position:relative;background:#fff;}
+.pb-cell:last-child{border-right:none;}
+.pb-cell.day-col{background:var(--red-pale);}
+.pb-row-label{display:flex;align-items:center;justify-content:center;padding:8px 4px;background:var(--red);writing-mode:vertical-rl;border-top:1.5px solid rgba(255,255,255,0.2);}
+.pb-row-label span{color:#fff;font-family:"Noto Serif SC","Noto Sans SC",sans-serif;font-size:1.1rem;letter-spacing:0.15em;}
+.pb-row-label small{color:rgba(255,255,255,0.7);font-size:0.6rem;display:block;margin-top:3px;font-family:"Noto Sans Thai",sans-serif;}
+.el-circle{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 9px;font-family:"Noto Serif SC",serif;font-size:1.5rem;font-weight:700;}
+.el-zh-big{font-size:1.5rem;font-family:"Noto Serif SC",serif;font-weight:700;display:block;margin-bottom:3px;}
+.el-py{font-size:0.78rem;font-style:italic;color:var(--gray);}
+.el-th{font-size:0.72rem;color:var(--gray-lt);margin-top:2px;}
+
+/* ELEMENT COLORS */
+.c-wood{color:var(--wood)!important;}.c-fire{color:var(--fire)!important;}.c-earth{color:var(--earth)!important;}.c-metal{color:var(--metal)!important;}.c-water{color:var(--water)!important;}
+.bg-wood{background:var(--wood-bg);}.bg-fire{background:var(--fire-bg);}.bg-earth{background:var(--earth-bg);}.bg-metal{background:var(--metal-bg);}.bg-water{background:var(--water-bg);}
+.bdr-wood{border-color:var(--wood)!important;}.bdr-fire{border-color:var(--fire)!important;}.bdr-earth{border-color:var(--earth)!important;}.bdr-metal{border-color:var(--metal)!important;}.bdr-water{border-color:var(--water)!important;}
+
+/* ELEMENT BARS (like image 3) */
+.el-bar{display:flex;align-items:center;gap:16px;padding:14px 18px;cursor:pointer;transition:all 0.15s;}
+.el-bar:hover{filter:brightness(0.95);transform:translateX(2px);}
+.el-bar-icon{flex-shrink:0;}
+.el-bar-name{font-size:1.05rem;font-weight:700;color:#fff;flex:1;}
+.el-bar-pct{font-size:1.05rem;font-weight:700;color:#fff;}
+
+/* ELEMENT ICONS SVG */
+.el-svg{font-family:"Noto Serif SC",serif;font-size:1.2rem;}
+
+/* ANALYSIS GRID */
+.ag{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.ai{background:var(--bg);border:1px solid var(--gray-bd);border-radius:11px;padding:13px;}
+.ai-t{font-size:0.69rem;font-weight:700;letter-spacing:0.1em;color:var(--red);text-transform:uppercase;margin-bottom:7px;}
+.ai-x{font-size:0.83rem;color:var(--gray);line-height:1.7;}
+
+/* ACCORDION */
+.acc{background:#fff;border:1.5px solid var(--gray-bd);border-radius:13px;overflow:hidden;margin-bottom:11px;}
+.acc-h{padding:13px 17px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:background 0.12s;}
+.acc-h:hover{background:var(--red-pale);}
+.acc-t{font-size:0.87rem;font-weight:700;display:flex;align-items:center;gap:9px;color:var(--black);}
+.acc-c{color:var(--red);font-size:1rem;transition:transform 0.2s;display:inline-block;}
+.acc-c.open{transform:rotate(180deg);}
+.acc-b{display:none;padding:0 17px 17px;border-top:1px solid var(--gray-bd);}
+.acc-b.open{display:block;}
+
+/* RADAR */
+#radarChart{min-height:280px;}
+
+/* PERCENT BARS */
+.pbar-row{display:flex;align-items:center;gap:11px;margin-bottom:8px;}
+.pbar-lbl{font-size:0.77rem;font-weight:600;width:50px;text-align:right;}
+.pbar-track{flex:1;height:9px;background:#f0ece8;border-radius:99px;overflow:hidden;}
+.pbar-fill{height:100%;border-radius:99px;transition:width 0.9s cubic-bezier(.4,0,.2,1);}
+.pbar-pct{font-size:0.74rem;color:var(--gray-lt);width:34px;}
+
+/* COLOR CHIPS */
+.cchips{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px;}
+.cchip{display:flex;align-items:center;gap:6px;padding:4px 11px;border-radius:16px;border:1px solid var(--gray-bd);font-size:0.77rem;background:#fff;color:var(--gray);}
+.cdot{width:10px;height:10px;border-radius:50%;border:1px solid rgba(0,0,0,0.1);}
+
+/* HISTORY */
+#page-history{background:var(--bg);padding:66px 16px 60px;}
+#page-history.active{display:block;}
+.hist-wrap{max-width:980px;margin:0 auto;}
+.hist-title{font-family:"Ma Shan Zheng",serif;font-size:1.7rem;color:var(--red);margin-bottom:18px;display:flex;align-items:center;gap:10px;}
+.search-bar{background:#fff;border:1.5px solid var(--gray-bd);border-radius:9px;padding:9px 15px;color:var(--black);font-size:0.89rem;font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;width:100%;max-width:270px;outline:none;transition:border-color 0.18s;}
+.search-bar:focus{border-color:var(--red);}
+.htw{background:#fff;border-radius:14px;overflow:hidden;border:1px solid var(--gray-bd);box-shadow:0 2px 10px rgba(0,0,0,0.05);}
+.ht{width:100%;border-collapse:collapse;}
+.ht th{background:var(--red);color:#fff;padding:11px 14px;font-size:0.76rem;font-weight:700;text-align:left;letter-spacing:0.06em;}
+.ht td{padding:11px 14px;border-bottom:1px solid #f0ece8;color:var(--black);font-size:0.85rem;vertical-align:middle;}
+.ht tr:hover td{background:#fdf6f5;}
+.ht tr:last-child td{border-bottom:none;}
+.hn{font-weight:700;color:var(--black);}
+.he{font-size:0.69rem;font-weight:700;margin-top:3px;}
+.hbtn{padding:5px 11px;border-radius:7px;font-size:0.72rem;font-weight:700;cursor:pointer;border:1.5px solid;margin-right:4px;font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;transition:all 0.14s;}
+.hbv{border-color:var(--red);color:var(--red);background:var(--red-pale);}
+.hbv:hover{background:var(--red);color:#fff;}
+.hbd{border-color:#ddd;color:#999;background:#f9f9f9;}
+.hbd:hover{border-color:#e74c3c;color:#e74c3c;background:#fdf2f2;}
+.pagination{display:flex;gap:5px;}
+.pgbtn{padding:6px 11px;border-radius:7px;font-size:0.78rem;cursor:pointer;border:1.5px solid var(--gray-bd);background:#fff;color:var(--gray);transition:all 0.13s;}
+.pgbtn.active{border-color:var(--red);color:var(--red);background:var(--red-pale);font-weight:700;}
+.pgbtn:hover:not(.active){border-color:var(--red);color:var(--red);}
+
+/* QR MODAL */
+.modal-ov{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.modal-ov.open{display:flex;}
+.modal-box{background:#fff;border-radius:18px;overflow:hidden;width:420px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,0.2);}
+.modal-hdr{background:var(--red);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;}
+.modal-tit{font-size:0.88rem;font-weight:700;color:#fff;}
+.modal-cls{background:none;border:none;color:rgba(255,255,255,0.8);cursor:pointer;font-size:1.2rem;line-height:1;}
+.modal-cls:hover{color:#fff;}
+.modal-bdy{padding:22px;background:#fff;}
+.slip-cw{display:flex;justify-content:center;margin-bottom:14px;}
+.modal-ftr{padding:14px 22px;border-top:1px solid var(--gray-bd);display:flex;gap:9px;justify-content:flex-end;}
+.bsm{padding:9px 17px;border-radius:8px;font-size:0.81rem;font-weight:700;cursor:pointer;font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;transition:all 0.15s;border:none;}
+.bsm-out{background:#fff;color:var(--gray);border:1.5px solid var(--gray-bd);}
+.bsm-out:hover{border-color:var(--red);color:var(--red);}
+.bsm-red{background:var(--red);color:#fff;box-shadow:0 3px 10px rgba(181,40,28,0.25);}
+.bsm-red:hover{background:var(--red3);}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.fu{animation:fadeUp 0.38s ease forwards;}
+.fu1{animation-delay:0.05s;opacity:0;}.fu2{animation-delay:0.1s;opacity:0;}.fu3{animation-delay:0.16s;opacity:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.spin{animation:spin 0.6s linear;}
+
+/* PRINT */
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  body{background:#fff!important;}body::before{display:none;}
+  #navbar,.action-row,.cdown,.no-print{display:none!important;}
+  #page-result{padding:0!important;}.result-wrap{max-width:100%!important;}
+  .scard,.acc,.ai{box-shadow:none!important;}.acc-b{display:block!important;}
+}
+.swal-cn .swal2-popup{background:#fff;border:2px solid var(--red);border-radius:16px;}
+.swal-cn .swal2-title{color:var(--red);}
+.swal2-loader{border-color:var(--red) transparent var(--red) transparent!important;}
+</style>
+</head>
+<body>
+
+<nav id="navbar">
+  <div class="nav-inner">
+    <div class="logo">
+      <span class="logo-zh">命</span>
+      <div>Soul Element<span class="logo-sub">四柱命理 · ปาจื้อดูดวง</span></div>
+    </div>
+    <div class="nav-links">
+      <button class="nav-btn" id="nav-home" onclick="goPage('home')">ดูดวง</button>
+      <button class="nav-btn" id="nav-history" onclick="goPage('history')">ประวัติ</button>
+      <button class="nav-refresh" onclick="refreshPage()" title="รีเฟรช">↺</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HOME -->
+<div id="page-home" class="page">
+  <div class="home-wrap">
+    <div class="hero-badge">🏮 ระบบดูดวงปาจื้อ</div>
+    <h1 class="hero-title">Soul <span>Element</span></h1>
+    <p class="hero-sub">กรอกข้อมูลเกิด เพื่อวิเคราะห์สี่เสาหลักและธาตุประจำตัว</p>
+    <div class="form-card">
+      <div class="form-sec">👤 ข้อมูลส่วนตัว</div>
+      <div class="fg"><label class="fl">ชื่อ - นามสกุล *</label><input type="text" id="inp-name" class="fi" placeholder="กรอกชื่อ-นามสกุล"/></div>
+      <div class="form-row">
+        <div class="fg"><label class="fl">เพศ</label><select id="inp-gender" class="fi"><option value="male">♂ ชาย</option><option value="female">♀ หญิง</option></select></div>
+        <div class="fg"><label class="fl">Tag</label><div class="tag-chips"><div class="tc" onclick="toggleTag(this)">VIP</div><div class="tc" onclick="toggleTag(this)">เรื่องงาน</div><div class="tc" onclick="toggleTag(this)">เรื่องรัก</div><div class="tc" onclick="toggleTag(this)">เรื่องเงิน</div><div class="tc" onclick="toggleTag(this)">สุขภาพ</div></div></div>
+      </div>
+      <div class="form-sec">📅 วันเวลาเกิด</div>
+      <div class="form-row">
+        <div class="fg"><label class="fl">วันเกิด *</label><input type="date" id="inp-date" class="fi"/></div>
+        <div class="fg"><label class="fl">เวลาเกิด</label><input type="time" id="inp-time" class="fi" value="12:00"/><div class="cbrow"><input type="checkbox" id="no-time" onchange="toggleTime(this)"/><label for="no-time">ไม่ทราบเวลาเกิด</label></div></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-outline" onclick="clearForm()">↺ ล้างข้อมูล</button>
+        <button class="btn btn-red" onclick="calculate()">🔮 คำนวณผลปาจื้อ</button>
+      </div>
+    </div>
+    <div id="recent-section" class="recent-sec" style="display:none">
+      <div class="recent-lbl">ดูล่าสุด</div>
+      <div class="recent-list" id="recent-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="page-result" class="page">
+  <div class="result-wrap" id="result-wrap">
+    <div style="display:flex;align-items:center;justify-content:center;height:300px;">
+      <div style="text-align:center;color:var(--gray-lt)">
+        <div style="font-size:3rem;margin-bottom:12px">命</div>
+        <div>กรุณากรอกข้อมูลและคำนวณก่อน</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY -->
+<div id="page-history" class="page">
+  <div class="hist-wrap">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:11px;">
+      <h2 class="hist-title">🏮 ประวัติการดูดวง</h2>
+      <input class="search-bar" id="hist-search" placeholder="🔍 ค้นหาชื่อ..." oninput="renderHistory()"/>
+    </div>
+    <div class="htw">
+      <table class="ht">
+        <thead><tr><th style="width:38px">#</th><th>วันที่ดูดวง</th><th>ชื่อ - นามสกุล</th><th>Tag</th><th style="width:120px">จัดการ</th></tr></thead>
+        <tbody id="hist-tbody"></tbody>
+      </table>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:11px;flex-wrap:wrap;gap:9px;">
+      <div id="hist-count" style="font-size:0.78rem;color:var(--gray-lt)"></div>
+      <div id="pagination-wrap"></div>
+    </div>
+  </div>
+</div>
+
+<!-- QR MODAL -->
+<div class="modal-ov" id="qr-modal">
+  <div class="modal-box">
+    <div class="modal-hdr"><span class="modal-tit">🔖 สลิปใบดูดวง (58mm)</span><button class="modal-cls" onclick="closeQr()">✕</button></div>
+    <div class="modal-bdy"><div class="slip-cw"><canvas id="slip-canvas"></canvas></div></div>
+    <div class="modal-ftr"><button class="bsm bsm-out" onclick="closeQr()">ปิด</button><button class="bsm bsm-red" onclick="downloadSlip()">⬇ ดาวน์โหลด PNG</button></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+// Element icons defined via EL_ICON and EL_ICON_CH below
+const EL_ICON_CH = {wood:'木',fire:'火',earth:'土',metal:'金',water:'水'};
+
+/* ── BAZI DATA ──────────────────────────────────── */
+const STEMS=[
+  {zh:"甲",py:"Jiǎ",thai:"เจี่ย",el:"wood",pol:"yang",thaiEl:"ธาตุไม้หยาง"},
+  {zh:"乙",py:"Yǐ", thai:"อี่",  el:"wood",pol:"yin", thaiEl:"ธาตุไม้หยิน"},
+  {zh:"丙",py:"Bǐng",thai:"ปิ่ง",el:"fire",pol:"yang",thaiEl:"ธาตุไฟหยาง"},
+  {zh:"丁",py:"Dīng",thai:"ติง", el:"fire",pol:"yin", thaiEl:"ธาตุไฟหยิน"},
+  {zh:"戊",py:"Wù", thai:"อู้",  el:"earth",pol:"yang",thaiEl:"ธาตุดินหยาง"},
+  {zh:"己",py:"Jǐ", thai:"จี่",  el:"earth",pol:"yin", thaiEl:"ธาตุดินหยิน"},
+  {zh:"庚",py:"Gēng",thai:"เกิง",el:"metal",pol:"yang",thaiEl:"ธาตุทองหยาง"},
+  {zh:"辛",py:"Xīn",thai:"ซิน", el:"metal",pol:"yin", thaiEl:"ธาตุทองหยิน"},
+  {zh:"壬",py:"Rén",thai:"เหริน",el:"water",pol:"yang",thaiEl:"ธาตุน้ำหยาง"},
+  {zh:"癸",py:"Guǐ",thai:"กุ่ย",el:"water",pol:"yin", thaiEl:"ธาตุน้ำหยิน"},
+];
+const BRANCHES=[
+  {zh:"子",py:"Zǐ",  thai:"จื่อ",  el:"water",pol:"yang",animal:"ชวด",  idx:0},
+  {zh:"丑",py:"Chǒu",thai:"โฉ่ว",  el:"earth",pol:"yin", animal:"ฉลู",  idx:1},
+  {zh:"寅",py:"Yín", thai:"หยิน",  el:"wood", pol:"yang",animal:"ขาล",  idx:2},
+  {zh:"卯",py:"Mǎo", thai:"เหม่า", el:"wood", pol:"yin", animal:"เถาะ", idx:3},
+  {zh:"辰",py:"Chén",thai:"เฉิน",  el:"earth",pol:"yang",animal:"มะโรง",idx:4},
+  {zh:"巳",py:"Sì",  thai:"ซื่อ",  el:"fire", pol:"yin", animal:"มะเส็ง",idx:5},
+  {zh:"午",py:"Wǔ",  thai:"อู่",   el:"fire", pol:"yang",animal:"มะเมีย",idx:6},
+  {zh:"未",py:"Wèi", thai:"เว่ย",  el:"earth",pol:"yin", animal:"มะแม", idx:7},
+  {zh:"申",py:"Shēn",thai:"เซิน",  el:"metal",pol:"yang",animal:"วอก",  idx:8},
+  {zh:"酉",py:"Yǒu", thai:"โหย่ว", el:"metal",pol:"yin", animal:"ระกา", idx:9},
+  {zh:"戌",py:"Xū",  thai:"ซฺวี", el:"earth",pol:"yang",animal:"จอ",   idx:10},
+  {zh:"亥",py:"Hài", thai:"ไห่",   el:"water",pol:"yin", animal:"กุน",  idx:11},
+];
+
+/* Zang Gan (hidden stems) - branch → weighted element distribution summing to 1.0 */
+const ZANG_GAN={
+  0:[["water",1.0]],                               // 子 zi
+  1:[["earth",0.6],["metal",0.3],["water",0.1]],  // 丑 chou
+  2:[["wood",0.6],["fire",0.3],["earth",0.1]],    // 寅 yin
+  3:[["wood",1.0]],                               // 卯 mao
+  4:[["earth",0.6],["wood",0.3],["water",0.1]],  // 辰 chen
+  5:[["fire",0.6],["earth",0.3],["metal",0.1]],  // 巳 si
+  6:[["fire",0.7],["earth",0.3]],                 // 午 wu
+  7:[["earth",0.6],["fire",0.3],["wood",0.1]],   // 未 wei
+  8:[["metal",0.6],["water",0.3],["earth",0.1]], // 申 shen
+  9:[["metal",1.0]],                              // 酉 you
+  10:[["earth",0.6],["metal",0.3],["fire",0.1]],  // 戌 xu
+  11:[["water",0.7],["wood",0.3]],                // 亥 hai
+};
+
+const EL_COLOR={wood:"#3D7A4B",fire:"#C0392B",earth:"#9C7A2E",metal:"#8B7355",water:"#2C5282"};
+const EL_BG   ={wood:"#EBF5ED",fire:"#FDECEA",earth:"#FDF5E0",metal:"#F5F0E8",water:"#EBF0FA"};
+const EL_THAI ={wood:"ไม้",fire:"ไฟ",earth:"ดิน",metal:"ทอง",water:"น้ำ"};
+const EL_ICON ={wood:"🌿",fire:"🔥",earth:"⛰️",metal:"⚙️",water:"💧"};
+const GENERATED_BY={fire:"wood",earth:"fire",metal:"earth",water:"metal",wood:"water"};
+const GENERATES   ={wood:"fire",fire:"earth",earth:"metal",metal:"water",water:"wood"};
+const CONTROLS    ={wood:"earth",earth:"water",water:"fire",fire:"metal",metal:"wood"};
+const CONTROLLED_BY={earth:"wood",water:"earth",fire:"water",metal:"fire",wood:"metal"};
+
+const STEM_EL=["wood","wood","fire","fire","earth","earth","metal","metal","water","water"];
+const BRANCH_EL=["water","earth","wood","wood","earth","fire","fire","earth","metal","metal","earth","water"];
+
+const DM_DATA={
+  wood:{personality:["สร้างสรรค์ มีวิสัยทัศน์","เมตตากรุณา ใจดี","ชอบการเติบโตพัฒนา","ยืดหยุ่นปรับตัวได้ดี"],strength:["ความคิดสร้างสรรค์","ความเป็นผู้นำที่เมตตา","มองการณ์ไกล"],weakness:["ใจร้อนอารมณ์ขึ้นลง","ขาดความเด็ดขาด","อ่อนไหวง่าย"],career:["ศิลปะและการออกแบบ","การศึกษา","งานสิ่งแวดล้อม","งานสังคม"],colors:["#22c55e","#16a34a","#3b82f6","#1d4ed8"],colorNames:["เขียวอ่อน","เขียวเข้ม","ฟ้า","น้ำเงิน"],gems:["มรกต","หยก","เทอร์คอยส์"],fengshui:"จัดพื้นที่ทิศตะวันออก วางต้นไม้มงคลสีเขียว ใช้วัสดุไม้ธรรมชาติ",lucky_dirs:["ตะวันออก","ตะวันออกเฉียงใต้"]},
+  fire:{personality:["กระตือรือร้นมีพลัง","มีเสน่ห์ดึงดูด","กล้าหาญมุ่งมั่น","ชอบความท้าทาย"],strength:["ความเป็นผู้นำโดดเด่น","ความกระตือรือร้น","ความกล้าหาญ"],weakness:["หุนหันพลันแล่น","ขาดความอดทน","อารมณ์รุนแรง"],career:["การแสดงบันเทิง","การตลาด PR","การเมืองบริหาร","ธุรกิจการขาย"],colors:["#ef4444","#f97316","#ec4899","#a855f7"],colorNames:["แดง","ส้ม","ชมพู","ม่วง"],gems:["ทับทิม","การ์เนต","โรสควอตซ์"],fengshui:"จัดพื้นที่ทิศใต้ โทนสีแดงส้ม วางโคมไฟสวยงาม เทียนหอม",lucky_dirs:["ใต้","ตะวันออกเฉียงใต้"]},
+  earth:{personality:["มั่นคงเชื่อถือได้","รอบคอบระมัดระวัง","ชอบความสงบสุข","รับผิดชอบสูง"],strength:["ความมั่นคงน่าเชื่อถือ","ความรอบคอบละเอียด","ความอดทน"],weakness:["ยึดติดประเพณีเกินไป","ขาดความคิดสร้างสรรค์","เฉื่อยชาต่อการเปลี่ยนแปลง"],career:["อสังหาริมทรัพย์","การเกษตรและอาหาร","การบัญชีการเงิน","ราชการ"],colors:["#b8860b","#d97706","#ca8a04","#f59e0b"],colorNames:["น้ำตาลดิน","ส้มดิน","เหลืองทอง","เหลืองอำพัน"],gems:["ซิทริน","อำพัน","ทองเหลือง"],fengshui:"จัดพื้นที่กลางบ้านหรือทิศตะวันตกเฉียงใต้ ใช้ดินเผา หิน เซรามิก",lucky_dirs:["กลาง","ตะวันตกเฉียงใต้"]},
+  metal:{personality:["แน่วแน่มีหลักการ","ตรงไปตรงมา","มีระเบียบวินัยสูง","ยุติธรรม"],strength:["ความเด็ดขาดแน่วแน่","ความมีระเบียบ","ความยุติธรรม"],weakness:["แข็งกร้าวเกินไป","ยืดหยุ่นน้อย","วิจารณ์ตนเองและคนอื่นมาก"],career:["กฎหมาย","การทหาร/ตำรวจ","การเงินการลงทุน","วิศวกรรม"],colors:["#D4AF37","#e5e7eb","#9ca3af","#f9fafb"],colorNames:["ทอง","เงิน","เทา","ขาว"],gems:["เพชร","คริสตัล","มูนสโตน"],fengshui:"จัดพื้นที่ทิศตะวันตก ของตกแต่งโลหะ ระฆังลม กรอบโลหะ",lucky_dirs:["ตะวันตก","ตะวันตกเฉียงเหนือ"]},
+  water:{personality:["ฉลาดปัญญาไว","ปรับตัวได้ยืดหยุ่น","มีสัญชาตญาณสูง","เข้าใจมนุษย์ลึกซึ้ง"],strength:["ปัญญาและความฉลาด","การปรับตัว","เข้าใจจิตใจมนุษย์"],weakness:["ลังเลไม่เด็ดขาด","กังวลมากเกินไป","อ่อนไหวต่อแวดล้อม"],career:["ปรัชญา/ศาสนา","งานวิจัย","ศิลปะ/ดนตรี","จิตวิทยา"],colors:["#3b82f6","#1e40af","#111827","#6b7280"],colorNames:["ฟ้า","น้ำเงิน","ดำ","เทา"],gems:["ไพลิน","อะความารีน","ลาพิสลาซูลี"],fengshui:"จัดพื้นที่ทิศเหนือ วางน้ำพุ ตู้ปลา โทนสีน้ำเงิน",lucky_dirs:["เหนือ","ตะวันออกเฉียงเหนือ"]},
+};
+
+const EL_DETAIL={
+  wood:{desc:"คุณมีธาตุไม้ ซึ่งแสดงถึงพลังชีวิต การเจริญเติบโต และความสร้างสรรค์ คนธาตุไม้มักมีความคิดริเริ่ม มีวิสัยทัศน์กว้างไกล และมีความเมตตาต่อผู้คนรอบข้าง",advice:"ดูแลตับและดวงตา หลีกเลี่ยงความโกรธสะสม ฝึกสมาธิเพื่อความสงบจิตใจ",house:"วางต้นไม้สีเขียว วัสดุไม้ธรรมชาติ ตกแต่งทิศตะวันออก",colors:["#22c55e","#4ade80","#6ee7b7"],colorNames:["เขียวขี้ม้า","เขียวมิ้นต์","เขียวมะนาว"],gems:["มรกต","หยก","เพอริดอท"]},
+  fire:{desc:"คุณมีธาตุไฟ ซึ่งแสดงถึงพลังงาน ความกระตือรือร้น และความสว่างไสว คนธาตุไฟมักมีเสน่ห์ดึงดูดผู้คน มีความกล้าหาญ และสามารถสร้างแรงบันดาลใจให้คนอื่น",advice:"ดูแลหัวใจและระบบไหลเวียนเลือด ควบคุมอารมณ์ไม่ให้ร้อนแรงเกินไป",house:"โคมไฟสวยงาม โทนสีแดงส้ม เทียนหอม ตกแต่งทิศใต้",colors:["#ef4444","#f97316","#fbbf24"],colorNames:["แดง","ส้ม","เหลืองทอง"],gems:["ทับทิม","การ์เนต","ซันสโตน"]},
+  earth:{desc:"คุณมีธาตุดิน ซึ่งแสดงถึงความมั่นคง ความน่าเชื่อถือ และความอดทน คนธาตุดินมักเป็นที่พึ่งพาได้ รอบคอบ และมีความรับผิดชอบสูง",advice:"ดูแลระบบย่อยอาหารและม้าม อย่ายึดติดวิธีเก่าจนเกินไป ฝึกเปิดรับสิ่งใหม่",house:"วัสดุดินเผา หิน เซรามิก โทนสีน้ำตาลเหลือง ตกแต่งทิศกลางบ้าน",colors:["#b8860b","#d4a84b","#e8c97e"],colorNames:["น้ำตาลดิน","ทองอ่อน","เหลืองแชมเปญ"],gems:["ซิทริน","อำพัน","ไทเกอร์อาย"]},
+  metal:{desc:"คุณมีธาตุทอง ซึ่งแสดงถึงความแน่วแน่ ความมีหลักการ และความยุติธรรม คนธาตุทองมักตรงไปตรงมา มีระเบียบวินัย และมีมาตรฐานสูงในการทำงาน",advice:"ดูแลปอดและลำไส้ใหญ่ ฝึกความยืดหยุ่น อย่าแข็งกร้าวจนทำร้ายความสัมพันธ์",house:"ของตกแต่งโลหะ ระฆังลม กรอบโลหะ โทนสีขาวเงิน ตกแต่งทิศตะวันตก",colors:["#D4AF37","#C0C0C0","#9ca3af"],colorNames:["เงิน","ขาว","เทา"],gems:["มุก","เพชร","คริสตัล"]},
+  water:{desc:"คุณมีธาตุน้ำ ซึ่งแสดงถึงปัญญา ความยืดหยุ่น และความลึกซึ้ง คนธาตุน้ำมักฉลาด ปรับตัวเก่ง มีสัญชาตญาณสูง และสามารถเข้าใจผู้คนได้อย่างลึกซึ้ง",advice:"ดูแลไตและกระเพาะปัสสาวะ ฝึกความเด็ดขาด อย่าลังเลมากเกินไป",house:"น้ำพุ ตู้ปลา กระจกบานใหญ่ โทนสีน้ำเงินดำ ตกแต่งทิศเหนือ",colors:["#2C5282","#1e40af","#374151"],colorNames:["กรมท่า","น้ำเงิน","เทาเข้ม"],gems:["ไพลิน","อะความารีน","ลาพิสลาซูลี"]},
+};
+
+
+/* ── COMPATIBILITY DATA (天干合 + 相剋 with polarity) ── */
+// Based on Heavenly Stem Combination (天干合) for compatibility
+// and Control cycle with same polarity clash for incompatibility
+// Key: "element_polarity" of Day Master
+const COMPAT_DATA={
+  "wood_yang":{
+    good:{el:"earth",pol:"yin",  thaiEl:"ธาตุดินหยิน",
+      reason:"甲己合 — ไม้หยางและดินหยินเป็นคู่ผสานกัน คนธาตุดินหยินมีความอบอุ่น ใจดี ยืดหยุ่น เสริมความสร้างสรรค์ของคุณได้พอดี ความสัมพันธ์มีความสมดุลระหว่างความฝันและความจริง"},
+    bad: {el:"metal",pol:"yang",thaiEl:"ธาตุทองหยาง",
+      reason:"庚剋甲 — ทองหยางตัดไม้หยาง ขั้วเดียวกันยิ่งขัดแย้ง คนธาตุทองหยางมีความแข็งกร้าวและตรงไปตรงมามากเกินไป ทำให้คุณรู้สึกถูกกดทับและขาดอิสระในการแสดงออก"}
+  },
+  "wood_yin":{
+    good:{el:"metal",pol:"yang",thaiEl:"ธาตุทองหยาง",
+      reason:"乙庚合 — ไม้หยินและทองหยางเป็นคู่ผสานกัน คนธาตุทองหยางมีความเด็ดขาดและวิสัยทัศน์ที่ช่วยให้คุณมีทิศทางชัดเจน ความแตกต่างระหว่างยืดหยุ่นและแน่วแน่กลับเสริมกันได้ดี"},
+    bad: {el:"metal",pol:"yin", thaiEl:"ธาตุทองหยิน",
+      reason:"辛剋乙 — ทองหยินตัดไม้หยิน ขั้วเดียวกันยิ่งรุนแรง คนธาตุทองหยินมีความวิจารณ์ละเอียดลออที่มักทำให้คุณรู้สึกไม่มั่นใจในตัวเอง บรรยากาศความสัมพันธ์มักตึงเครียด"}
+  },
+  "fire_yang":{
+    good:{el:"metal",pol:"yin", thaiEl:"ธาตุทองหยิน",
+      reason:"丙辛合 — ไฟหยางและทองหยินเป็นคู่ผสานกัน คนธาตุทองหยินมีความละเอียดรอบคอบและมีรสนิยมที่สมดุลกับพลังงานสูงของคุณ ช่วยให้ความสัมพันธ์มีทั้งความตื่นเต้นและความสง่างาม"},
+    bad: {el:"water",pol:"yang",thaiEl:"ธาตุน้ำหยาง",
+      reason:"壬剋丙 — น้ำหยางดับไฟหยาง ขั้วเดียวกันรุนแรง คนธาตุน้ำหยางมีความเย็นชาและสุขุมที่ขัดแย้งกับความร้อนแรงของคุณ มักเถียงกันเรื่องการตัดสินใจและทิศทางในชีวิต"}
+  },
+  "fire_yin":{
+    good:{el:"water",pol:"yang",thaiEl:"ธาตุน้ำหยาง",
+      reason:"丁壬合 — ไฟหยินและน้ำหยางเป็นคู่ผสานกัน คนธาตุน้ำหยางมีปัญญาลึกซึ้งและความยืดหยุ่นที่เข้ากับความอ่อนโยนของคุณ ความสัมพันธ์มีความลึกและความเข้าใจกันอย่างแท้จริง"},
+    bad: {el:"water",pol:"yin", thaiEl:"ธาตุน้ำหยิน",
+      reason:"癸剋丁 — น้ำหยินดับไฟหยิน ขั้วเดียวกันซ้ำเติม คนธาตุน้ำหยินมีความเก็บกดและลังเลที่กดทับพลังงานอ่อนโยนของคุณ ความสัมพันธ์มักทำให้คุณรู้สึกหมดแรงและสับสน"}
+  },
+  "earth_yang":{
+    good:{el:"water",pol:"yin", thaiEl:"ธาตุน้ำหยิน",
+      reason:"戊癸合 — ดินหยางและน้ำหยินเป็นคู่ผสานกัน คนธาตุน้ำหยินมีความลึกและนุ่มนวลที่ทำให้ความมั่นคงของคุณมีชีวิตชีวา ความสัมพันธ์มีทั้งความอบอุ่นและความลุ่มลึก"},
+    bad: {el:"wood",pol:"yang",thaiEl:"ธาตุไม้หยาง",
+      reason:"甲剋戊 — ไม้หยางทะลุทะลวงดินหยาง ขั้วเดียวกันยิ่งรุนแรง คนธาตุไม้หยางมีความเปลี่ยนแปลงและริเริ่มที่ทำลายความสงบของคุณ มักขัดแย้งเรื่องวิธีการทำงานและเป้าหมาย"}
+  },
+  "earth_yin":{
+    good:{el:"wood",pol:"yang",thaiEl:"ธาตุไม้หยาง",
+      reason:"己甲合 — ดินหยินและไม้หยางเป็นคู่ผสานกัน คนธาตุไม้หยางมีความกระตือรือร้นและวิสัยทัศน์ที่กระตุ้นให้คุณเปิดรับสิ่งใหม่ ความสัมพันธ์มีความสมดุลระหว่างความมั่นคงและการเติบโต"},
+    bad: {el:"wood",pol:"yin", thaiEl:"ธาตุไม้หยิน",
+      reason:"乙剋己 — ไม้หยินเซาะดินหยิน ขั้วเดียวกันแทรกซึม คนธาตุไม้หยินมีความอ่อนแต่ดื้อเงียบที่ค่อยๆ ทำลายความมั่นคงของคุณ ความสัมพันธ์มักทำให้คุณรู้สึกถูกดูดพลังงาน"}
+  },
+  "metal_yang":{
+    good:{el:"wood",pol:"yin", thaiEl:"ธาตุไม้หยิน",
+      reason:"庚乙合 — ทองหยางและไม้หยินเป็นคู่ผสานกัน คนธาตุไม้หยินมีความยืดหยุ่นและความอ่อนโยนที่สมดุลกับความแข็งกร้าวของคุณ ความสัมพันธ์มีทั้งความมั่นคงและความงดงาม"},
+    bad: {el:"fire",pol:"yang",thaiEl:"ธาตุไฟหยาง",
+      reason:"丙剋庚 — ไฟหยางหลอมทองหยาง ขั้วเดียวกันรุนแรง คนธาตุไฟหยางมีความร้อนแรงและหุนหันที่ทำให้คุณรู้สึกไม่มั่นคง มักขัดแย้งเรื่องความรีบร้อนเทียบกับความรอบคอบ"}
+  },
+  "metal_yin":{
+    good:{el:"fire",pol:"yang",thaiEl:"ธาตุไฟหยาง",
+      reason:"辛丙合 — ทองหยินและไฟหยางเป็นคู่ผสานกัน คนธาตุไฟหยางมีพลังงานและความกล้าที่ช่วยละลายความเย็นชาของคุณ ความสัมพันธ์ทำให้คุณกล้าแสดงออกและมีชีวิตชีวามากขึ้น"},
+    bad: {el:"fire",pol:"yin", thaiEl:"ธาตุไฟหยิน",
+      reason:"丁剋辛 — ไฟหยินตีทองหยิน ขั้วเดียวกันแทรกซึม คนธาตุไฟหยินมีความอ่อนแต่ร้อนที่ค่อยๆ สึกกร่อนความสมบูรณ์แบบของคุณ มักวิจารณ์กันจนสัมพันธ์แย่ลง"}
+  },
+  "water_yang":{
+    good:{el:"fire",pol:"yin", thaiEl:"ธาตุไฟหยิน",
+      reason:"壬丁合 — น้ำหยางและไฟหยินเป็นคู่ผสานกัน คนธาตุไฟหยินมีความอบอุ่นนุ่มนวลที่สมดุลกับความลึกของคุณ ความสัมพันธ์มีความลึกและเข้าใจกันโดยไม่ต้องพูดมาก"},
+    bad: {el:"earth",pol:"yang",thaiEl:"ธาตุดินหยาง",
+      reason:"戊剋壬 — ดินหยางกั้นน้ำหยาง ขั้วเดียวกันยิ่งรุนแรง คนธาตุดินหยางมีความดื้อรั้นและยึดติดที่ขัดขวางความไหลลื่นของคุณ มักขัดแย้งเรื่องความยืดหยุ่นและการเปลี่ยนแปลง"}
+  },
+  "water_yin":{
+    good:{el:"earth",pol:"yang",thaiEl:"ธาตุดินหยาง",
+      reason:"癸戊合 — น้ำหยินและดินหยางเป็นคู่ผสานกัน คนธาตุดินหยางมีความมั่นคงและโครงสร้างที่ทำให้ความลึกของคุณมีทิศทาง ความสัมพันธ์มีทั้งความปลอดภัยและความลุ่มลึก"},
+    bad: {el:"earth",pol:"yin", thaiEl:"ธาตุดินหยิน",
+      reason:"己剋癸 — ดินหยินดูดน้ำหยิน ขั้วเดียวกันซ้ำเติม คนธาตุดินหยินมีความเหนียวแน่นเงียบๆ ที่ค่อยๆ ดูดซับพลังงานของคุณ ความสัมพันธ์มักทำให้คุณรู้สึกหมดแรงและขาดแรงบันดาลใจ"}
+  }
+};
+
+/* ── LUCKY COLORS PER DAY MASTER ─────────────────── */
+// Based on element of Day Master + generated element (相生)
+const DM_COLORS={
+  "wood_yang": [{c:"#2E7D32",n:"เขียวเข้ม"},{c:"#388E3C",n:"เขียว"},{c:"#1565C0",n:"น้ำเงินเข้ม"}],
+  "wood_yin":  [{c:"#4CAF50",n:"เขียวสด"}, {c:"#81C784",n:"เขียวอ่อน"},{c:"#42A5F5",n:"ฟ้า"}],
+  "fire_yang": [{c:"#C62828",n:"แดงเข้ม"}, {c:"#E53935",n:"แดง"},      {c:"#F4511E",n:"ส้มแดง"}],
+  "fire_yin":  [{c:"#AD1457",n:"ชมพูแดง"},{c:"#E91E63",n:"ชมพูสด"},   {c:"#7B1FA2",n:"ม่วง"}],
+  "earth_yang":[{c:"#5D4037",n:"น้ำตาล"}, {c:"#FF8F00",n:"เหลืองดิน"},{c:"#E64A19",n:"ส้มเข้ม"}],
+  "earth_yin": [{c:"#795548",n:"น้ำตาลอ่อน"},{c:"#FFA000",n:"เหลืองทอง"},{c:"#FFD54F",n:"เหลืองนวล"}],
+  "metal_yang":[{c:"#757575",n:"เทาเข้ม"},{c:"#BDBDBD",n:"เทาอ่อน"},{c:"#FAFAFA",n:"ขาว"}],
+  "metal_yin": [{c:"#9E9E9E",n:"เงิน"},   {c:"#F5F5F5",n:"ขาวบริสุทธิ์"},{c:"#FFC107",n:"ทองเหลือง"}],
+  "water_yang":[{c:"#1A237E",n:"กรมท่า"},{c:"#9E9E9E",n:"เทา"},      {c:"#80CBC4",n:"เขียวมิ้นต์"}],
+  "water_yin": [{c:"#311B92",n:"ม่วงเข้ม"},{c:"#546E7A",n:"เทาเขียว"},{c:"#B0BEC5",n:"เทาฟ้าอ่อน"}],
+};
+
+/* ── APP STATE ──────────────────────────────────── */
+let currentResult=null, radarChart=null, countdownInt=null, histPage=1;
+const PER_PAGE=20, GAS_URL="YOUR_GAS_URL_HERE";
+
+/* ── PAGE ROUTING ───────────────────────────────── */
+function goPage(n){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+  document.getElementById("page-"+n).classList.add("active");
+  const nb=document.getElementById("nav-"+n);if(nb)nb.classList.add("active");
+  window.scrollTo(0,0);
+  if(n==="history")renderHistory();
+  if(n==="home")renderRecent();
+}
+function refreshPage(){
+  const r=document.querySelector(".nav-refresh");
+  if(r){r.classList.add("spin");setTimeout(()=>r.classList.remove("spin"),600);}
+  location.reload();
+}
+
+/* ── BAZI CALC ──────────────────────────────────── */
+function calcBazi(year,month,day,hour,hasTime){
+  /* Year */
+  let adjY=year;
+  if(month<2||(month===2&&day<4))adjY--;
+  const ysi=((adjY-4)%10+10)%10;
+  const ybi=((adjY-4)%12+12)%12;
+
+  /* Month — FIXED formula */
+  const ysg=ysi%5;
+  const mss=[2,4,6,8,0]; // stem start for each year-stem group
+  const mnum=(month-2+12)%12; // 寅 starts at month 2
+  const msi=(mss[ysg]+mnum)%10;
+  const mbi=month%12; // April(4)→4→辰 ✓
+
+  /* Day */
+  const at=Math.floor((14-month)/12);
+  const y2=year+4800-at,m2=month+12*at-3;
+  const jdn=day+Math.floor((153*m2+2)/5)+365*y2+Math.floor(y2/4)-Math.floor(y2/100)+Math.floor(y2/400)-32045;
+  const dsi=((jdn+9)%10+10)%10;
+  const dbi=((jdn+1)%12+12)%12;
+
+  /* Hour */
+  let hsi=0,hbi=0;
+  if(hasTime){
+    hbi=Math.floor(((hour+1)%24)/2);
+    const dsg=dsi%5;
+    const hss=[0,2,4,6,8];
+    hsi=(hss[dsg]+hbi)%10;
+  }
+
+  return{
+    yearStem:STEMS[ysi],yearBranch:BRANCHES[ybi],
+    monthStem:STEMS[msi],monthBranch:BRANCHES[mbi],
+    dayStem:STEMS[dsi],dayBranch:BRANCHES[dbi],
+    hourStem:STEMS[hsi],hourBranch:BRANCHES[hbi],
+  };
+}
+
+function calcElements(bazi,hasTime){
+  const c={wood:0,fire:0,earth:0,metal:0,water:0};
+  const keys=["wood","fire","earth","metal","water"];
+  /* Simple count: each stem and branch main element = 1 point */
+  const stems=[bazi.yearStem,bazi.monthStem,bazi.dayStem];
+  const branches=[bazi.yearBranch,bazi.monthBranch,bazi.dayBranch];
+  if(hasTime){stems.push(bazi.hourStem);branches.push(bazi.hourBranch);}
+  stems.forEach(s=>c[s.el]+=1);
+  branches.forEach(b=>c[b.el]+=1);
+  /* Apply 3% minimum floor for absent elements (match reference display) */
+  const total0=Object.values(c).reduce((a,b)=>a+b,0);
+  const minFloor=total0*0.03/0.97; // allocate ~3% for absent
+  keys.forEach(k=>{if(c[k]===0)c[k]=minFloor;});
+  const total=Object.values(c).reduce((a,b)=>a+b,0);
+  const pct={};
+  keys.forEach(k=>pct[k]=Math.round(c[k]/total*100));
+  /* Fix rounding to sum to 100% */
+  let sum=keys.reduce((a,k)=>a+pct[k],0);
+  if(sum!==100){
+    const diff=100-sum;
+    // Add diff to largest element (or subtract from largest if diff<0)
+    const sorted=keys.slice().sort((a,b)=>pct[b]-pct[a]);
+    pct[sorted[0]]+=diff;
+  }
+  return{pct};
+}
+
+function elThaiName(el){return{wood:"ธาตุไม้",fire:"ธาตุไฟ",earth:"ธาตุดิน",metal:"ธาตุทอง",water:"ธาตุน้ำ"}[el]||el;}
+
+/* ── CALCULATE ──────────────────────────────────── */
+function calculate(){
+  const name=document.getElementById("inp-name").value.trim();
+  const dateVal=document.getElementById("inp-date").value;
+  const timeVal=document.getElementById("inp-time").value;
+  const noTime=document.getElementById("no-time").checked;
+  const gender=document.getElementById("inp-gender").value;
+  const tags=[...document.querySelectorAll(".tc.sel")].map(c=>c.textContent.trim());
+  if(!name)return toast2("error","กรุณากรอกชื่อ-นามสกุล");
+  if(!dateVal)return toast2("error","กรุณาเลือกวันเกิด");
+  const[year,month,day]=dateVal.split("-").map(Number);
+  let hour=12;
+  if(!noTime&&timeVal)hour=parseInt(timeVal.split(":")[0],10);
+  Swal.fire({
+    title:"<span style=\"font-family:'Ma Shan Zheng',serif;color:#B5281C\">กำลังคำนวณดวง...</span>",
+    html:"<div style=\"color:#888;font-size:0.84rem\">ประมวลผลสี่เสาหลัก 四柱命理</div>",
+    allowOutsideClick:false,showConfirmButton:false,background:"#fff",
+    customClass:{popup:"swal-cn"},didOpen:()=>Swal.showLoading()
+  });
+  setTimeout(()=>{
+    const bazi=calcBazi(year,month,day,hour,!noTime);
+    const{pct}=calcElements(bazi,!noTime);
+    const createdAt=Date.now();          // integer ms
+    const expireAt=createdAt+(7*24*60*60*1000); // exactly 7 days later
+    const id="be-"+createdAt;
+    const result={id,name,dateVal,timeVal:noTime?null:timeVal,gender,tags,bazi,pct,createdAt,expireAt,noTime};
+    currentResult=result;
+    saveLocal(result);saveGAS(result).catch(()=>{});
+    Swal.close();renderResult(result);goPage("result");
+  },700);
+}
+
+/* ── RENDER RESULT ──────────────────────────────── */
+function renderResult(r){
+  if(radarChart){try{radarChart.destroy();}catch(e){}radarChart=null;}
+  if(countdownInt)clearInterval(countdownInt);
+  const bazi=r.bazi,pct=r.pct,dm=bazi.dayStem,dmD=DM_DATA[dm.el];
+  const dmKey=dm.el+"_"+dm.pol; // e.g. "water_yang"
+  const compatInfo=COMPAT_DATA[dmKey]||COMPAT_DATA[dm.el+"_yang"];
+  const dmColors=DM_COLORS[dmKey]||DM_COLORS[dm.el+"_yang"];
+  const sorted=["wood","fire","earth","metal","water"].map(e=>({el:e,pct:pct[e]||0})).sort((a,b)=>b.pct-a.pct);
+  const major=sorted.filter(e=>e.pct>=20),minor=sorted.filter(e=>e.pct<20);
+  const gStr=r.gender==="male"?"♂ ชาย":"♀ หญิง";
+  const dStr=fmtDate(r.dateVal);
+
+  /* Pillars display: Hour|Day|Month|Year (right-to-left Chinese convention, shown left-to-right) */
+  const pillarCols=r.noTime
+    ?[{zh:"年",th:"ปี",      stem:bazi.yearStem, branch:bazi.yearBranch},
+      {zh:"月",th:"เดือน",   stem:bazi.monthStem,branch:bazi.monthBranch},
+      {zh:"日",th:"วัน",     stem:bazi.dayStem,  branch:bazi.dayBranch, isDay:true}]
+    :[{zh:"時",th:"ชั่วโมง", stem:bazi.hourStem, branch:bazi.hourBranch},
+      {zh:"日",th:"วัน",     stem:bazi.dayStem,  branch:bazi.dayBranch, isDay:true},
+      {zh:"月",th:"เดือน",   stem:bazi.monthStem,branch:bazi.monthBranch},
+      {zh:"年",th:"ปี",      stem:bazi.yearStem, branch:bazi.yearBranch}];
+  const ncols=pillarCols.length;
+
+  document.getElementById("result-wrap").innerHTML=`
+<div class="result-header fu">
+  <div class="result-header-row">
+    <div>
+      <div class="result-name">${esc(r.name)}</div>
+      <div class="result-meta">
+        <span class="mi">📅 ${dStr}</span>
+        ${!r.noTime?`<span class="mi">🕐 ${r.timeVal} น.</span>`:""}
+        <span class="mi">${gStr}</span>
+      </div>
+      ${r.tags&&r.tags.length?`<div style="margin-top:7px">${r.tags.map(t=>`<span class="rtag">${esc(t)}</span>`).join("")}</div>`:""}
+    </div>
+    <div class="dm-badge">
+      <div class="dm-icon" style="font-family:'Noto Serif SC',serif">${dm.zh}</div>
+      <div><div style="font-size:0.69rem;opacity:0.8">Day Master</div><div>${dm.thaiEl}</div></div>
+    </div>
+  </div>
+  <div class="cdown no-print">
+    <span class="cdown-lbl">⏳ ข้อมูลหมดอายุใน</span>
+    <span class="cdown-timer" id="ctimer">กำลังโหลด...</span>
+  </div>
+</div>
+
+<div class="action-row no-print fu fu1">
+  <button class="abtn abtn-back" onclick="goPage('home')">← กลับหน้าแรก</button>
+  <button class="abtn" onclick="window.print()">🖨 พิมพ์ A4</button>
+  <button class="abtn" onclick="openQr()">🔖 QR Code</button>
+  <button class="abtn" onclick="shareLink('${r.id}')">🔗 แชร์ลิงก์</button>
+  <button class="abtn no-print" onclick="refreshPage()" style="margin-left:auto">↺ รีเฟรช</button>
+</div>
+
+<!-- PILLARS TABLE -->
+<div class="scard fu fu2">
+  <div class="stitle">ตารางสี่เสาหลัก 四柱</div>
+  <div style="font-size:0.74rem;color:#B5281C;font-weight:600;margin-bottom:12px">
+    ธาตุ Day Master: <span style="color:${EL_COLOR[dm.el]}">${dm.thaiEl}</span>
+    &nbsp;·&nbsp; ${dStr}${!r.noTime?" • "+r.timeVal+" น.":""}
+  </div>
+  <div style="overflow-x:auto">
+  <table style="width:100%;border-collapse:collapse;border:2px solid #B5281C;border-radius:14px;overflow:hidden;min-width:380px">
+    <!-- HEADER ROW -->
+    <thead>
+      <tr style="background:#B5281C">
+        ${pillarCols.map(p=>`
+        <th style="padding:10px 6px;text-align:center;color:#fff;border-right:1px solid rgba(255,255,255,0.2);${p.isDay?"background:#922B21;":""}"
+        ><span style="font-family:'Noto Serif SC',serif;font-size:1.1rem;display:block">${p.zh}</span>
+        <span style="font-size:0.72rem;opacity:0.85;font-family:'Noto Sans Thai',sans-serif">${p.th}</span></th>`).join("")}
+        <th rowspan="2" style="padding:6px 4px;text-align:center;color:#fff;width:34px;background:#7B1A12;vertical-align:top">
+          <div style="writing-mode:vertical-rl;font-family:'Noto Serif SC',serif;font-size:1rem;letter-spacing:0.2em;margin-bottom:4px">天干</div>
+          <div style="writing-mode:vertical-rl;font-size:0.6rem;opacity:0.7;font-family:'Noto Sans Thai',sans-serif">ฟ้า</div>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- STEM ROW (天干) -->
+      <tr>
+        ${pillarCols.map(p=>`
+        <td style="padding:16px 10px;text-align:center;border-right:1px solid #f0e8e8;border-top:1px solid #e8d8d8;background:${p.isDay?"#FEF0EE":"#fff"};vertical-align:middle">
+          <div style="width:50px;height:50px;border-radius:50%;background:${EL_COLOR[p.stem.el]}18;border:2px solid ${EL_COLOR[p.stem.el]}60;margin:0 auto 10px;display:flex;align-items:center;justify-content:center">
+            <span style="font-family:'Noto Serif SC',serif;font-size:1.5rem;font-weight:700;color:${EL_COLOR[p.stem.el]}">${p.stem.zh}</span>
+          </div>
+          <div style="font-family:'Noto Serif SC',serif;font-size:1.1rem;font-weight:700;color:${EL_COLOR[p.stem.el]};margin-bottom:3px">${p.stem.zh} <span style="font-size:0.85rem;font-style:italic;color:#888">${p.stem.py}</span></div>
+          <div style="font-size:0.74rem;color:#777">${p.stem.thaiEl}</div>
+        </td>`).join("")}
+      </tr>
+      <!-- BRANCH ROW (地支) -->
+      <tr style="border-top:2px solid #B5281C">
+        ${pillarCols.map(p=>`
+        <td style="padding:16px 10px;text-align:center;border-right:1px solid #f0e8e8;background:${p.isDay?"#FEF0EE":"#fff"};vertical-align:middle;position:relative">
+          <div style="width:50px;height:50px;border-radius:12px;background:${EL_COLOR[p.branch.el]}15;border:2px solid ${EL_COLOR[p.branch.el]}50;margin:0 auto 10px;display:flex;align-items:center;justify-content:center">
+            <span style="font-family:'Noto Serif SC',serif;font-size:1.5rem;font-weight:700;color:${EL_COLOR[p.branch.el]}">${p.branch.zh}</span>
+          </div>
+          <div style="font-family:'Noto Serif SC',serif;font-size:1.1rem;font-weight:700;color:${EL_COLOR[p.branch.el]};margin-bottom:3px">${p.branch.zh} <span style="font-size:0.85rem;font-style:italic;color:#888">${p.branch.py}</span></div>
+          <div style="font-size:0.74rem;color:#777">${elThaiName(p.branch.el)}${p.branch.pol==="yang"?"หยาง":"หยิน"}·${p.branch.animal}</div>
+        </td>`).join("")}
+        <td style="padding:6px 4px;text-align:center;background:#7B1A12;vertical-align:middle">
+          <div style="writing-mode:vertical-rl;font-family:'Noto Serif SC',serif;font-size:1rem;letter-spacing:0.2em;color:#fff;margin-bottom:4px">地支</div>
+          <div style="writing-mode:vertical-rl;font-size:0.6rem;color:rgba(255,255,255,0.7);font-family:'Noto Sans Thai',sans-serif">แผ่นดิน</div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- TABLE EXPLAIN -->
+<div class="acc fu fu3">
+  <div class="acc-h" onclick="toggleAcc(this)">
+    <span class="acc-t">📖 คำอธิบายตาราง</span><span class="acc-c">▾</span>
+  </div>
+  <div class="acc-b">
+    <div style="font-size:0.85rem;color:var(--gray);line-height:2.0;margin-top:12px">
+      <b style="color:var(--red)">Day Master (日 วัน)</b> คือเสาวันเกิด — ตัวแทนตัวตนของคุณ<br>
+      ธาตุ Day Master ของคุณคือ <b style="color:${EL_COLOR[dm.el]}">${dm.thaiEl}</b> (${dm.zh} · ${dm.py})<br>
+      ธาตุส่งเสริม: <b style="color:${EL_COLOR[GENERATED_BY[dm.el]]}">${EL_THAI[GENERATED_BY[dm.el]]}</b> &nbsp;|&nbsp;
+      ธาตุที่ควบคุม: <b style="color:${EL_COLOR[CONTROLS[dm.el]]}">${EL_THAI[CONTROLS[dm.el]]}</b> &nbsp;|&nbsp;
+      ธาตุที่ขัดแย้ง: <b style="color:${EL_COLOR[CONTROLLED_BY[dm.el]]}">${EL_THAI[CONTROLLED_BY[dm.el]]}</b><br>
+      ธาตุมากสุดในดวง: <b style="color:${EL_COLOR[sorted[0].el]}">${EL_THAI[sorted[0].el]} (${sorted[0].pct}%)</b>
+    </div>
+  </div>
+</div>
+
+<!-- DAY MASTER ANALYSIS -->
+<div class="scard fu">
+  <div class="stitle">วิเคราะห์ Day Master</div>
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:17px;flex-wrap:wrap">
+    <div class="el-circle bg-${dm.el}" style="width:64px;height:64px;border:2px solid ${EL_COLOR[dm.el]};flex-shrink:0">
+      <span style="font-family:'Noto Serif SC',serif;font-size:2rem;font-weight:700;color:${EL_COLOR[dm.el]}">${dm.zh}</span>
+    </div>
+    <div>
+      <div style="font-family:'Ma Shan Zheng',serif;font-size:1.35rem;color:var(--red)">${dm.thaiEl}</div>
+      <div style="color:var(--gray-lt);font-size:0.82rem;margin-top:2px">${dm.py} · ${dm.thai} · ${dm.pol==="yang"?"หยาง ☀️":"หยิน 🌙"}</div>
+    </div>
+  </div>
+  <div class="ag">
+    <div class="ai"><div class="ai-t">✦ จุดแข็ง</div><div class="ai-x">${dmD.strength.map(s=>"• "+s).join("<br>")}</div></div>
+    <div class="ai"><div class="ai-t">◈ จุดอ่อน</div><div class="ai-x">${dmD.weakness.map(s=>"• "+s).join("<br>")}</div></div>
+    <div class="ai"><div class="ai-t">☯ บุคลิกภาพ</div><div class="ai-x">${dmD.personality.map(s=>"• "+s).join("<br>")}</div></div>
+    <div class="ai"><div class="ai-t">💼 อาชีพที่เหมาะ</div><div class="ai-x">${dmD.career.map(s=>"• "+s).join("<br>")}</div></div>
+  </div>
+</div>
+
+<!-- FENGSHUI -->
+<div class="acc fu">
+  <div class="acc-h" onclick="toggleAcc(this)">
+    <span class="acc-t">🎨 สีและฮวงจุ้ยเสริมธาตุ</span><span class="acc-c">▾</span>
+  </div>
+  <div class="acc-b">
+    <div style="margin-top:14px">
+      <p style="font-size:0.71rem;font-weight:700;color:var(--red);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px">สีมงคลเสริมธาตุ ${EL_THAI[dm.el]}</p>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:6px">
+        ${dmColors.map(({c,n})=>`
+        <div style="text-align:center">
+          <div style="width:52px;height:52px;border-radius:50%;background:${c};border:2px solid ${c}50;margin:0 auto 6px;box-shadow:0 2px 8px ${c}40"></div>
+          <div style="font-size:0.77rem;color:#555;font-weight:500">${n}</div>
+        </div>`).join("")}
+      </div>
+      <div style="margin-top:14px;background:var(--red-pale);border:1px solid rgba(181,40,28,0.15);border-radius:11px;padding:14px">
+        <p style="font-size:0.75rem;font-weight:700;color:var(--red);margin-bottom:5px">🏠 ฮวงจุ้ยบ้าน/ที่ทำงาน</p>
+        <p style="font-size:0.85rem;color:var(--gray);line-height:1.7">${dmD.fengshui}</p>
+        <p style="margin-top:9px;font-size:0.75rem;font-weight:700;color:var(--red)">🧭 ทิศมงคล</p>
+        <p style="font-size:0.85rem;color:var(--gray)">${dmD.lucky_dirs.join(" · ")}</p>
+        <p style="margin-top:9px;font-size:0.75rem;font-weight:700;color:var(--red)">💎 อัญมณีเสริมดวง</p>
+        <p style="font-size:0.85rem;color:var(--gray)">${dmD.gems.join(", ")}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPATIBILITY SECTION -->
+<div class="acc fu">
+  <div class="acc-h" onclick="toggleAcc(this)">
+    <span class="acc-t">☯ ความเข้ากันได้กับธาตุอื่น</span><span class="acc-c open">▾</span>
+  </div>
+  <div class="acc-b open">
+    <div style="margin-top:14px;display:grid;gap:12px">
+      <!-- Compatible -->
+      <div style="background:${EL_BG[compatInfo.good.el]};border:1.5px solid ${EL_COLOR[compatInfo.good.el]}45;border-radius:13px;padding:18px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+          <span style="font-size:0.8rem;font-weight:700;color:#333">เข้ากันได้ดีกับ</span>
+          <span style="background:${EL_COLOR[compatInfo.good.el]};color:#fff;padding:4px 16px;border-radius:20px;font-size:0.83rem;font-weight:700">${compatInfo.good.thaiEl}</span>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:14px">
+          <div style="width:48px;height:48px;border-radius:50%;background:${EL_COLOR[compatInfo.good.el]};display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 10px ${EL_COLOR[compatInfo.good.el]}40">
+            <span style="font-family:'Noto Serif SC',serif;font-size:1.4rem;color:#fff;font-weight:700">${EL_ICON_CH[compatInfo.good.el]}</span>
+          </div>
+          <p style="font-size:0.86rem;color:#444;line-height:1.85;margin:0">${compatInfo.good.reason}</p>
+        </div>
+      </div>
+      <!-- Incompatible -->
+      <div style="background:#FFF5F5;border:1.5px solid ${EL_COLOR[compatInfo.bad.el]}40;border-radius:13px;padding:18px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+          <span style="font-size:0.8rem;font-weight:700;color:#333">เข้ากันไม่ค่อยดีกับ</span>
+          <span style="background:${EL_COLOR[compatInfo.bad.el]};color:#fff;padding:4px 16px;border-radius:20px;font-size:0.83rem;font-weight:700">${compatInfo.bad.thaiEl}</span>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:14px">
+          <div style="width:48px;height:48px;border-radius:50%;background:${EL_COLOR[compatInfo.bad.el]};display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 10px ${EL_COLOR[compatInfo.bad.el]}35">
+            <span style="font-family:'Noto Serif SC',serif;font-size:1.4rem;color:#fff;font-weight:700">${EL_ICON_CH[compatInfo.bad.el]}</span>
+          </div>
+          <p style="font-size:0.86rem;color:#444;line-height:1.85;margin:0">${compatInfo.bad.reason}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ELEMENT BARS (like image 3) — ธาตุหลัก -->
+<div class="scard fu">
+  <div style="font-size:0.78rem;font-weight:700;color:var(--red);margin-bottom:14px;display:flex;align-items:center;gap:8px">
+    ธาตุหลักของคุณ
+    <span style="font-size:0.69rem;color:var(--gray-lt);font-weight:400;background:#f5f0ec;padding:2px 9px;border-radius:10px;border:1px solid var(--gray-bd)">≥ 20%</span>
+    <span style="height:1px;flex:1;background:linear-gradient(90deg,rgba(181,40,28,0.25),transparent)"></span>
+  </div>
+  ${major.map(e=>renderElBar(e.el,e.pct)).join("")}
+  ${minor.length?`
+  <div style="margin-top:18px;padding-top:16px;border-top:1px dashed var(--gray-bd)">
+    <div style="font-size:0.78rem;font-weight:700;color:var(--gray-lt);margin-bottom:12px;display:flex;align-items:center;gap:8px">
+      ธาตุที่มีน้อย
+      <span style="font-size:0.69rem;font-weight:400;background:#f5f0ec;padding:2px 9px;border-radius:10px;border:1px solid var(--gray-bd)">< 20%</span>
+      <span style="height:1px;flex:1;background:linear-gradient(90deg,rgba(0,0,0,0.1),transparent)"></span>
+    </div>
+    ${minor.map(e=>renderElBarMinor(e.el,e.pct)).join("")}
+  </div>`:""}
+</div>
+
+<!-- RADAR -->
+<div class="scard fu">
+  <div class="stitle">สัดส่วนธาตุทั้ง 5 (กราฟเรดาร์)</div>
+  <div id="radarChart"></div>
+</div>
+
+<!-- MAJOR ELEMENT DETAILS -->
+${major.length?`<div class="fu"><div style="font-size:0.7rem;font-weight:700;letter-spacing:0.14em;color:var(--red);text-transform:uppercase;margin-bottom:10px">🔴 รายละเอียดธาตุหลัก</div>${major.map(e=>renderElAcc(e.el,e.pct,true)).join("")}</div>`:""}
+${minor.length?`<div class="fu" style="margin-top:${major.length?"4px":"0"}"><div style="font-size:0.7rem;font-weight:700;letter-spacing:0.14em;color:var(--gray-lt);text-transform:uppercase;margin-bottom:10px">⚪ ธาตุที่ควรเสริม</div>${minor.map(e=>renderElAcc(e.el,e.pct,false)).join("")}</div>`:""}
+`;
+
+  /* Radar Chart — fixed scale: 20% per ring, 100% = outer edge */
+  setTimeout(()=>{
+    const series=["wood","fire","earth","metal","water"].map(e=>pct[e]||0);
+    /* ApexCharts radar with fixed max=100 and 5 rings at 20% each */
+    radarChart=new ApexCharts(document.getElementById("radarChart"),{
+      chart:{type:"radar",height:300,background:"transparent",toolbar:{show:false}},
+      series:[{name:"สัดส่วน",data:series}],
+      labels:["ไม้","ไฟ","ดิน","ทอง","น้ำ"],
+      colors:[EL_COLOR["fire"]],
+      fill:{opacity:0.18,colors:[EL_COLOR["fire"]]},
+      markers:{size:5,colors:[EL_COLOR["fire"]],hover:{size:7}},
+      stroke:{width:2.5,colors:[EL_COLOR["fire"]]},
+      plotOptions:{radar:{polygons:{strokeColors:"#e0d8d0",strokeWidth:1,fill:{colors:["#fdf8f5","#f9f2ef"]}}}},
+      yaxis:{show:true,min:0,max:100,tickAmount:5, /* 5 ticks = 0,20,40,60,80,100 */
+        labels:{show:false},
+        stepSize:20},
+      xaxis:{labels:{style:{colors:["#3D7A4B","#C0392B","#9C7A2E","#8B7355","#2C5282"],fontSize:"13px",fontFamily:"Noto Sans Thai, Noto Sans SC"}}},
+      tooltip:{theme:"light",y:{formatter:v=>v+"%"}},
+      theme:{mode:"light"}
+    });
+    radarChart.render();
+  },120);
+
+  startCountdown(Number(r.expireAt));
+}
+
+function renderElBar(el,pct){
+  const color=EL_COLOR[el];
+  return `<div class="el-bar" style="background:${color};border-radius:14px;margin-bottom:10px" onclick="scrollToElDetail('${el}')">
+    <div class="el-bar-icon">
+      <div style="width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <span style="font-family:'Noto Serif SC',serif;font-size:1.3rem;color:#fff;font-weight:700">${EL_ICON_CH[el]}</span>
+      </div>
+    </div>
+    <span class="el-bar-name">ธาตุ${EL_THAI[el]}</span>
+    <span class="el-bar-pct">${pct}%</span>
+    <span class="el-bar-arrow" style="color:rgba(255,255,255,0.7);font-size:1.1rem;margin-left:2px">›</span>
+  </div>`;
+}
+function renderElBarMinor(el,pct){
+  const color=EL_COLOR[el];
+  return `<div class="el-bar" style="background:${EL_BG[el]};border:1.5px solid ${color}35;border-radius:14px;margin-bottom:10px" onclick="scrollToElDetail('${el}')">
+    <div class="el-bar-icon">
+      <div style="width:42px;height:42px;border-radius:50%;background:${color}18;border:1.5px solid ${color}40;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <span style="font-family:'Noto Serif SC',serif;font-size:1.3rem;color:${color};font-weight:700">${EL_ICON_CH[el]}</span>
+      </div>
+    </div>
+    <span class="el-bar-name" style="color:${color}">ธาตุ${EL_THAI[el]}</span>
+    <span class="el-bar-pct" style="color:${color}">${pct}%</span>
+    <span class="el-bar-arrow" style="color:${color}50;font-size:1.1rem;margin-left:2px">›</span>
+  </div>`;
+}
+function scrollToElDetail(el){
+  const id="el-detail-"+el;
+  const t=document.getElementById(id);
+  if(t){t.scrollIntoView({behavior:"smooth",block:"start"});
+    setTimeout(()=>{const b=t.querySelector(".acc-b");const c=t.querySelector(".acc-c");if(b&&!b.classList.contains("open")){b.classList.add("open");if(c)c.classList.add("open");}},400);}
+}
+
+function renderElAcc(el,pct,isMajor){
+  const d=EL_DETAIL[el],color=EL_COLOR[el],bg=EL_BG[el];
+  return `<div class="acc" style="border-color:${color}40;margin-bottom:9px" id="el-detail-${el}">
+    <div class="acc-h" onclick="toggleAcc(this)">
+      <span class="acc-t">
+        <span style="width:30px;height:30px;border-radius:8px;background:${bg};border:1.5px solid ${color}30;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif SC',serif;font-size:1.1rem;color:${color}">${EL_ICON_CH[el]}</span>
+        <span style="color:${color}">ธาตุ${EL_THAI[el]}</span>
+        <span style="font-size:0.77rem;color:var(--gray-lt)">${pct}%</span>
+        ${isMajor?`<span style="font-size:0.64rem;background:${color}12;color:${color};padding:2px 9px;border-radius:9px;border:1px solid ${color}28;font-weight:700">ธาตุหลัก</span>`:""}
+      </span>
+      <span class="acc-c">▾</span>
+    </div>
+    <div class="acc-b">
+      <div style="background:${bg};border-radius:10px;padding:14px;margin-top:14px;font-size:0.86rem;color:var(--gray);line-height:1.8">${d.desc}</div>
+      <div class="ag" style="margin-top:12px">
+        <div class="ai"><div class="ai-t">คำแนะนำสุขภาพ</div><div class="ai-x">${d.advice}</div></div>
+        <div class="ai"><div class="ai-t">ฮวงจุ้ยบ้าน</div><div class="ai-x">${d.house}</div></div>
+        <div class="ai">
+          <div class="ai-t">สีเสริมธาตุ</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:7px">${d.colors.map((c,i)=>`<span style="background:${c}15;color:${c};border:1.5px solid ${c}35;border-radius:8px;padding:3px 10px;font-size:0.73rem;font-weight:700;display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:${c};display:inline-block"></span>${d.colorNames[i]}</span>`).join("")}</div>
+        </div>
+        <div class="ai"><div class="ai-t">อัญมณีเสริม</div><div class="ai-x">${d.gems.join(", ")}</div></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ── COUNTDOWN ──────────────────────────────────── */
+function startCountdown(expMs){
+  if(countdownInt)clearInterval(countdownInt);
+  if(!isFinite(expMs)||expMs<=0)expMs=Date.now()+7*24*60*60*1000;
+  function tick(){
+    const el=document.getElementById("ctimer");
+    if(!el){clearInterval(countdownInt);return;}
+    const left=expMs-Date.now();
+    if(left<=0){el.textContent="หมดอายุแล้ว";clearInterval(countdownInt);return;}
+    const d=Math.floor(left/86400000),h=Math.floor((left%86400000)/3600000),
+          m=Math.floor((left%3600000)/60000),s=Math.floor((left%60000)/1000);
+    el.textContent=d+"วัน "+pad(h)+":"+pad(m)+":"+pad(s);
+  }
+  tick();countdownInt=setInterval(tick,1000);
+}
+
+/* ── ACCORDION ──────────────────────────────────── */
+function toggleAcc(hdr){
+  const b=hdr.nextElementSibling,c=hdr.querySelector(".acc-c");
+  b.classList.toggle("open");c.classList.toggle("open");
+}
+
+/* ── LOCAL STORAGE ──────────────────────────────── */
+function saveLocal(r){try{let h=getLocal().filter(x=>x.id!==r.id);h.unshift(r);if(h.length>300)h=h.slice(0,300);localStorage.setItem("baziHistory",JSON.stringify(h));}catch(e){}}
+function getLocal(){try{return JSON.parse(localStorage.getItem("baziHistory")||"[]");}catch(e){return[];}}
+function delLocal(id){try{localStorage.setItem("baziHistory",JSON.stringify(getLocal().filter(r=>r.id!==id)));}catch(e){}}
+
+/* ── GAS ────────────────────────────────────────── */
+async function saveGAS(r){if(!GAS_URL||GAS_URL==="YOUR_GAS_URL_HERE")return;await fetch(GAS_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"saveResult",data:r})});}
+async function delGAS(id){if(!GAS_URL||GAS_URL==="YOUR_GAS_URL_HERE")return;await fetch(GAS_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"deleteResult",id})});}
+
+/* ── RECENT ─────────────────────────────────────── */
+function renderRecent(){
+  const hist=getLocal().slice(0,6);
+  const sec=document.getElementById("recent-section"),list=document.getElementById("recent-list");
+  if(!hist.length){sec.style.display="none";return;}
+  sec.style.display="block";
+  list.innerHTML=hist.map(r=>{
+    const el=r.bazi?.dayStem?.el||"water",col=EL_COLOR[el];
+    return `<button class="recent-btn" style="border-color:${col}35" onclick="viewHist('${r.id}')"
+      onmouseover="this.style.borderColor='${col}';this.style.background='${col}08'"
+      onmouseout="this.style.borderColor='${col}35';this.style.background='#fff'">
+      <span class="recent-btn-zh" style="color:${col}">${r.bazi?.dayStem?.zh||"?"}</span>${esc(r.name)}
+    </button>`;
+  }).join("");
+}
+
+/* ── HISTORY ────────────────────────────────────── */
+function renderHistory(){
+  const q=(document.getElementById("hist-search")?.value||"").toLowerCase();
+  const hist=getLocal().filter(r=>r.name.toLowerCase().includes(q));
+  const total=hist.length,pages=Math.ceil(total/PER_PAGE)||1;
+  if(histPage>pages)histPage=pages;
+  const slice=hist.slice((histPage-1)*PER_PAGE,histPage*PER_PAGE);
+  const tb=document.getElementById("hist-tbody");
+  if(!total){tb.innerHTML=`<tr><td colspan="5" style="text-align:center;padding:40px;color:#bbb">ยังไม่มีประวัติการดูดวง</td></tr>`;
+  }else{
+    tb.innerHTML=slice.map((r,i)=>{
+      const idx=(histPage-1)*PER_PAGE+i+1,el=r.bazi?.dayStem?.el||"water";
+      const dt=new Date(r.createdAt).toLocaleDateString("th-TH",{year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+      return `<tr><td style="color:#bbb;font-size:0.78rem">${idx}</td><td style="color:var(--gray);font-size:0.82rem">${dt}</td>
+      <td><div class="hn">${esc(r.name)}</div><div class="he" style="color:${EL_COLOR[el]}">${EL_ICON[el]} ${r.bazi?.dayStem?.thaiEl||""}</div></td>
+      <td style="font-size:0.77rem;color:var(--gray-lt)">${(r.tags||[]).join(", ")}</td>
+      <td><button class="hbtn hbv" onclick="viewHist('${r.id}')">ดูผล</button><button class="hbtn hbd" onclick="delHist('${r.id}')">ลบ</button></td></tr>`;
+    }).join("");
+  }
+  document.getElementById("hist-count").textContent=total?"ทั้งหมด "+total+" รายการ":"";
+  const pw=document.getElementById("pagination-wrap");
+  if(pages<=1){pw.innerHTML="";return;}
+  pw.innerHTML=`<div class="pagination">${Array.from({length:pages},(_,i)=>`<button class="pgbtn${i+1===histPage?" active":""}" onclick="histPage=${i+1};renderHistory()">${i+1}</button>`).join("")}</div>`;
+}
+function viewHist(id){const r=getLocal().find(x=>x.id===id);if(!r)return toast2("error","ไม่พบข้อมูล");currentResult=r;renderResult(r);goPage("result");}
+function delHist(id){Swal.fire({title:"<span style=\"color:var(--red)\">ยืนยันการลบ?</span>",html:"<span style=\"color:#888\">ข้อมูลจะถูกลบออกถาวร</span>",icon:"warning",showCancelButton:true,confirmButtonText:"ลบ",cancelButtonText:"ยกเลิก",confirmButtonColor:"#B5281C",background:"#fff",customClass:{popup:"swal-cn"}}).then(res=>{if(res.isConfirmed){delLocal(id);delGAS(id).catch(()=>{});renderHistory();toast2("success","ลบข้อมูลแล้ว");}});}
+
+/* ── SHARE ──────────────────────────────────────── */
+function shareLink(id){const url=window.location.origin+window.location.pathname+"?id="+id;if(navigator.share)navigator.share({title:"Soul Element",url}).catch(()=>{});else navigator.clipboard.writeText(url).then(()=>toast2("success","คัดลอกลิงก์แล้ว!")).catch(()=>toast2("error","คัดลอกไม่สำเร็จ"));}
+
+/* ── QR ─────────────────────────────────────────── */
+function openQr(){if(!currentResult)return;document.getElementById("qr-modal").classList.add("open");setTimeout(()=>drawSlip(currentResult),80);}
+function closeQr(){document.getElementById("qr-modal").classList.remove("open");}
+function drawSlip(r){
+  const canvas=document.getElementById("slip-canvas"),ctx=canvas.getContext("2d");
+  const W=384,H=560;canvas.width=W;canvas.height=H;canvas.style.width="320px";canvas.style.height="auto";
+  ctx.fillStyle="#fff";ctx.fillRect(0,0,W,H);
+  ctx.fillStyle="#B5281C";ctx.fillRect(0,0,W,62);
+  ctx.fillStyle="#fff";ctx.font="bold 22px serif";ctx.textAlign="center";ctx.fillText("命 Soul Element",W/2,29);
+  ctx.fillStyle="rgba(255,255,255,0.7)";ctx.font="11px sans-serif";ctx.fillText("四柱命理 · ปาจื้อดูดวง",W/2,49);
+  ctx.fillStyle="#B5281C";ctx.font="bold 20px sans-serif";ctx.textAlign="center";ctx.fillText(r.name,W/2,94);
+  ctx.fillStyle="#444";ctx.font="13px sans-serif";ctx.fillText("วันเกิด: "+fmtDate(r.dateVal),W/2,116);
+  if(!r.noTime&&r.timeVal)ctx.fillText("เวลา: "+r.timeVal+" น.",W/2,136);
+  const el=r.bazi?.dayStem?.el||"water",elTh=r.bazi?.dayStem?.thaiEl||"";
+  ctx.fillStyle=EL_COLOR[el];ctx.font="bold 13px sans-serif";ctx.fillText("ธาตุประจำตัว: "+elTh,W/2,159);
+  ctx.strokeStyle="#e0d8d0";ctx.lineWidth=1;ctx.setLineDash([5,4]);
+  ctx.beginPath();ctx.moveTo(20,174);ctx.lineTo(W-20,174);ctx.stroke();ctx.setLineDash([]);
+  const qh=document.createElement("div");qh.style.cssText="position:absolute;left:-9999px;top:-9999px;width:180px;height:180px;background:#fff";
+  document.body.appendChild(qh);
+  const url=window.location.origin+window.location.pathname+"?id="+r.id;
+  try{
+    new QRCode(qh,{text:url,width:180,height:180,colorDark:"#1a1a1a",colorLight:"#fff"});
+    setTimeout(()=>{const qi=qh.querySelector("canvas")||qh.querySelector("img");if(qi){ctx.fillStyle="#fff";ctx.fillRect(W/2-94,184,188,188);ctx.drawImage(qi,W/2-90,188,180,180);}try{document.body.removeChild(qh);}catch(e){}},300);
+  }catch(e){try{document.body.removeChild(qh);}catch(e2){}}
+  const expMs=Number(r.expireAt);
+  const expStr=(!isNaN(expMs)&&expMs>0)?new Date(expMs).toLocaleDateString("th-TH",{year:"numeric",month:"long",day:"numeric"}):"—";
+  ctx.fillStyle="#999";ctx.font="11px sans-serif";ctx.textAlign="center";ctx.fillText("สแกนเพื่อดูผลดวงฉบับเต็ม",W/2,394);
+  ctx.fillStyle="#bbb";ctx.font="10px sans-serif";ctx.fillText("หมดอายุ: "+expStr,W/2,412);
+  ctx.fillStyle="#B5281C";ctx.fillRect(0,H-42,W,42);
+  ctx.fillStyle="#fff";ctx.font="11px sans-serif";ctx.fillText("Soul Element © ปาจื้อดูดวง",W/2,H-18);
+}
+function downloadSlip(){const c=document.getElementById("slip-canvas"),a=document.createElement("a");a.href=c.toDataURL("image/png");a.download="soul-element-slip.png";a.click();}
+
+/* ── SHARED LINK ────────────────────────────────── */
+function checkSharedLink(){
+  const id=new URLSearchParams(window.location.search).get("id");if(!id)return;
+  const r=getLocal().find(x=>x.id===id);
+  if(r){currentResult=r;renderResult(r);goPage("result");setTimeout(()=>{const ar=document.querySelector(".action-row");if(ar)ar.style.display="none";},200);}
+  else Swal.fire({title:"<span style=\"color:#B5281C\">ไม่พบข้อมูล</span>",html:"<span style=\"color:#888\">ลิงก์อาจหมดอายุแล้ว</span>",background:"#fff",customClass:{popup:"swal-cn"},icon:"warning"});
+}
+
+/* ── FORM HELPERS ───────────────────────────────── */
+function toggleTime(cb){const t=document.getElementById("inp-time");t.disabled=cb.checked;if(cb.checked)t.value="";else t.value="12:00";}
+function toggleTag(el){el.classList.toggle("sel");}
+function clearForm(){document.getElementById("inp-name").value="";document.getElementById("inp-date").value="";document.getElementById("inp-time").value="12:00";document.getElementById("no-time").checked=false;document.getElementById("inp-time").disabled=false;document.getElementById("inp-gender").value="male";document.querySelectorAll(".tc").forEach(c=>c.classList.remove("sel"));}
+
+/* ── UTILS ──────────────────────────────────────── */
+function pad(n){return String(n).padStart(2,"0");}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function fmtDate(d){if(!d)return"—";const dt=new Date(d+"T00:00:00");return dt.toLocaleDateString("th-TH",{year:"numeric",month:"long",day:"numeric"});}
+function toast2(type,msg){Swal.fire({toast:true,position:"top-end",showConfirmButton:false,timer:2500,timerProgressBar:true,title:(type==="success"?"✅":"❌")+" "+msg,background:"#fff",color:"#333",customClass:{popup:"swal-cn"}});}
+// EL_ICON already declared above
+
+/* ── INIT ───────────────────────────────────────── */
+document.addEventListener("DOMContentLoaded",()=>{
+  // Version check: clear old incompatible data
+  const VER="v3";
+  if(localStorage.getItem("baziVer")!==VER){
+    localStorage.removeItem("baziHistory");
+    localStorage.setItem("baziVer",VER);
+  }
+  document.getElementById("inp-date").valueAsDate=new Date();
+  goPage("home");checkSharedLink();
+});
+</script>
+</body>
+</html>
