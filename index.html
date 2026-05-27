@@ -469,6 +469,27 @@ const COMPAT_DATA={
   }
 };
 
+/* ── PERSONALITY CHIPS (short traits for share card) ── */
+const DM_CHIPS={
+  wood: ["มองโลกในแง่ดี","เมตตา","สร้างสรรค์","ชอบเสรีภาพ","เจ้าระเบียบ","ใจร้อน"],
+  fire: ["กล้าหาญ","มีเสน่ห์","กระตือรือร้น","หุนหันพลันแล่น","มีภาวะผู้นำ","ขาดความอดทน"],
+  earth: ["ซื่อสัตย์","มั่นคง","รับผิดชอบ","อนุรักษ์นิยม","ใจดี","ยึดติดประเพณี"],
+  metal: ["มีหลักการ","ตรงไปตรงมา","ระเบียบวินัย","ยุติธรรม","แข็งกร้าว","วิจารณ์ตัวเอง"],
+  water: ["มองโลกในแง่ดี","หัวโบราณ","ชอบเข้าสังคม","ไม่เชื่อฟัง","เป็นมิตร","ไม่ชอบถูกบังคับ"],
+};
+
+/* ── DAY OF WEEK THAI ──────────────────────────────── */
+const THAI_DOW=["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"];
+
+/* ── ELEMENT CHARACTER EMOJI/AVATAR ───────────────────*/
+const EL_AVATAR={
+  wood:  {emoji:"🌿", bg:"#2E7D32", char:"甲"},
+  fire:  {emoji:"🔥", bg:"#C62828", char:"丙"},
+  earth: {emoji:"⛰️",  bg:"#5D4037", char:"戊"},
+  metal: {emoji:"⚙️",  bg:"#757575", char:"庚"},
+  water: {emoji:"💧", bg:"#1A237E", char:"壬"},
+};
+
 /* ── LUCKY COLORS PER DAY MASTER ─────────────────── */
 // Based on element of Day Master + generated element (相生)
 const DM_COLORS={
@@ -614,6 +635,7 @@ function buildActionRow(rid){
     <button class="abtn" onclick="window.print()">🖨 พิมพ์ A4</button>
     <button class="abtn" onclick="openQr()">🔖 QR Code</button>
     <button class="abtn" onclick="shareLink('${rid}')">🔗 แชร์ลิงก์</button>
+    <button class="abtn" onclick="openShareCard()" style="border-color:#B5281C;color:#B5281C;background:#fef6f5">📤 แชร์รูป</button>
     <button class="abtn no-print" onclick="refreshPage()" style="margin-left:auto">↺ รีเฟรช</button>
   </div>`;
 }
@@ -1133,9 +1155,14 @@ function applySharedViewMode(){
   banner.innerHTML=`
     <div style="display:flex;align-items:center;justify-content:space-between;max-width:900px;margin:0 auto">
       <span>🔒 โหมดอ่านอย่างเดียว — ผลดูดวงปาจื้อ</span>
-      <button onclick="window.print()" style="background:rgba(255,255,255,0.2);border:1.5px solid rgba(255,255,255,0.5);color:#fff;padding:5px 14px;border-radius:7px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'Noto Sans Thai',sans-serif;transition:all 0.15s"
-        onmouseover="this.style.background='rgba(255,255,255,0.35)'"
-        onmouseout="this.style.background='rgba(255,255,255,0.2)'">🖨 พิมพ์</button>
+      <div style="display:flex;gap:8px">
+        <button onclick="window.print()" style="background:rgba(255,255,255,0.2);border:1.5px solid rgba(255,255,255,0.5);color:#fff;padding:5px 14px;border-radius:7px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'Noto Sans Thai',sans-serif;transition:all 0.15s"
+          onmouseover="this.style.background='rgba(255,255,255,0.35)'"
+          onmouseout="this.style.background='rgba(255,255,255,0.2)'">🖨 พิมพ์</button>
+        <button onclick="openShareCard()" style="background:rgba(255,255,255,0.9);border:none;color:#B5281C;padding:5px 14px;border-radius:7px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'Noto Sans Thai',sans-serif;transition:all 0.15s"
+          onmouseover="this.style.background='#fff'"
+          onmouseout="this.style.background='rgba(255,255,255,0.9)'">แชร์ 📤</button>
+      </div>
     </div>`;
   document.body.prepend(banner);
   // Adjust result page padding
@@ -1206,6 +1233,281 @@ function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",
 function fmtDate(d){if(!d)return"—";const dt=new Date(d+"T00:00:00");return dt.toLocaleDateString("th-TH",{year:"numeric",month:"long",day:"numeric"});}
 function toast2(type,msg){Swal.fire({toast:true,position:"top-end",showConfirmButton:false,timer:2500,timerProgressBar:true,title:(type==="success"?"✅":"❌")+" "+msg,background:"#fff",color:"#333",customClass:{popup:"swal-cn"}});}
 // EL_ICON already declared above
+
+
+/* ── SHARE CARD FUNCTIONS ───────────────────────────── */
+function openShareCard(){
+  if(!currentResult)return;
+  document.getElementById("share-card-modal").classList.add("open");
+  setTimeout(()=>drawShareCard(currentResult),80);
+}
+function closeShareCard(){document.getElementById("share-card-modal").classList.remove("open");}
+
+function downloadShareCard(){
+  const c=document.getElementById("share-canvas");
+  const a=document.createElement("a");
+  a.href=c.toDataURL("image/png");
+  a.download="soul-element-card.png";
+  a.click();
+}
+
+async function shareCardNative(){
+  const c=document.getElementById("share-canvas");
+  try{
+    const blob=await new Promise(res=>c.toBlob(res,"image/png"));
+    const file=new File([blob],"soul-element-card.png",{type:"image/png"});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],title:"ผลดูดวงปาจื้อ — Soul Element"});
+    }else{
+      downloadShareCard();
+    }
+  }catch(e){downloadShareCard();}
+}
+
+function drawShareCard(r){
+  const canvas=document.getElementById("share-canvas");
+  const ctx=canvas.getContext("2d");
+  const W=420, H=720;
+  canvas.width=W; canvas.height=H;
+  canvas.style.width=Math.min(W,360)+"px";
+  canvas.style.height="auto";
+
+  const dm=r.bazi?.dayStem;
+  const dmKey=(dm?.el||"water")+"_"+(dm?.pol||"yang");
+  const elColor=EL_COLOR[dm?.el||"water"];
+  const elBg=EL_BG[dm?.el||"water"];
+  const chips=DM_CHIPS[dm?.el||"water"]||[];
+  const colors=DM_COLORS[dmKey]||DM_COLORS["water_yang"];
+  const compat=COMPAT_DATA[dmKey]||COMPAT_DATA["water_yang"];
+  const dateObj=new Date((r.dateVal||"")+"T12:00:00");
+  const dow=THAI_DOW[dateObj.getDay()]||"";
+  const animal=r.bazi?.yearBranch?.animal||"";
+
+  // ── BACKGROUND ────────────────────────────────────────
+  // Cream/parchment background
+  ctx.fillStyle="#FDF6EE";
+  ctx.fillRect(0,0,W,H);
+
+  // Top decorative area (element color)
+  ctx.fillStyle=elColor;
+  ctx.beginPath();
+  ctx.moveTo(0,0); ctx.lineTo(W,0); ctx.lineTo(W,220); 
+  ctx.quadraticCurveTo(W/2,260,0,220);
+  ctx.closePath();
+  ctx.fill();
+
+  // Top red circles deco (like Chinese calendar pins)
+  [60,W-60].forEach(x=>{
+    ctx.fillStyle="#8B0000";
+    ctx.beginPath();ctx.arc(x,18,14,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle="#C0392B";
+    ctx.beginPath();ctx.arc(x,18,10,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle="rgba(255,255,255,0.3)";
+    ctx.beginPath();ctx.arc(x,14,5,0,Math.PI*2);ctx.fill();
+  });
+
+  // ── ELEMENT TITLE ─────────────────────────────────────
+  ctx.fillStyle="rgba(255,255,255,0.95)";
+  ctx.font="bold 22px 'Noto Serif SC','Noto Sans SC',serif";
+  ctx.textAlign="center";
+  ctx.fillText("ธาตุ"+EL_THAI[dm?.el||"water"]+(dm?.pol==="yang"?"หยาง":"หยิน"),W/2-20,58);
+  
+  // Chinese character next to title
+  ctx.font="bold 28px 'Noto Serif SC',serif";
+  ctx.fillStyle="rgba(255,255,255,0.9)";
+  ctx.fillText(dm?.zh||"壬", W/2+80, 58);
+
+  // ── AVATAR CIRCLE ─────────────────────────────────────
+  // Large circle background for character
+  ctx.fillStyle="rgba(255,255,255,0.15)";
+  ctx.beginPath();ctx.arc(W/2,160,75,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="rgba(255,255,255,0.08)";
+  ctx.beginPath();ctx.arc(W/2,160,88,0,Math.PI*2);ctx.fill();
+
+  // Element icon large
+  ctx.font="72px serif";
+  ctx.textAlign="center";
+  ctx.fillText(["🌿","🔥","⛰️","⚙️","💧"][["wood","fire","earth","metal","water"].indexOf(dm?.el||"water")],W/2,195);
+
+  // ── DATE INFO (right side vertical Chinese calendar style) ──
+  const [yr,mo,dy]=((r.dateVal||"2000-01-01")).split("-").map(Number);
+  // Month column
+  ctx.fillStyle="rgba(255,255,255,0.9)";
+  ctx.font="bold 13px 'Noto Sans SC',sans-serif";
+  ctx.textAlign="center";
+  ctx.fillText(mo,W-38,115);
+  ctx.font="12px 'Noto Sans Thai',sans-serif";
+  ctx.fillText("月",W-38,132);
+  // Day column
+  ctx.font="bold 28px 'Noto Serif SC',serif";
+  ctx.fillText(dy,W-38,168);
+  ctx.font="12px 'Noto Sans SC',sans-serif";
+  ctx.fillText("日",W-38,184);
+  if(r.timeVal){
+    ctx.font="11px 'Noto Sans Thai',sans-serif";
+    ctx.fillText(r.timeVal,W-38,200);
+  }
+
+  // Left side: element counts
+  const pct=r.pct||{};
+  ctx.font="11px 'Noto Sans Thai',sans-serif";
+  ctx.textAlign="left";
+  ctx.fillStyle="rgba(255,255,255,0.8)";
+  const elKeys=["wood","fire","earth","metal","water"];
+  const elTh=["ไม้","ไฟ","ดิน","ทอง","น้ำ"];
+  elKeys.forEach((el,i)=>{
+    if(pct[el]&&pct[el]>0){
+      const circle_y=80+i*28;
+      if(circle_y<220){
+        ctx.fillStyle="rgba(255,255,255,0.15)";
+        roundRect(ctx,12,circle_y-14,55,20,6,true,false);
+        ctx.fillStyle="rgba(255,255,255,0.85)";
+        ctx.font="10px 'Noto Sans Thai',sans-serif";
+        ctx.textAlign="left";
+        ctx.fillText(elTh[i]+" "+pct[el]+"%",16,circle_y);
+      }
+    }
+  });
+
+  // ── BIRTH DATE BAR ────────────────────────────────────
+  ctx.fillStyle=elColor;
+  ctx.fillRect(0,228,W,42);
+  ctx.fillStyle="#fff";
+  ctx.font="bold 16px 'Noto Sans Thai',sans-serif";
+  ctx.textAlign="center";
+  const thYear=yr+543;
+  ctx.fillText("วันเกิด "+dy+" "+["","ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."][mo]+" "+thYear,W/2,255);
+
+  // ── ZODIAC ROW ────────────────────────────────────────
+  ctx.fillStyle="#fff";
+  ctx.fillRect(0,270,W,40);
+  ctx.fillStyle="#555";
+  ctx.font="13px 'Noto Sans Thai',sans-serif";
+  ctx.textAlign="left";
+  ctx.fillText("ปีนักษัตร: "+animal,20,295);
+  ctx.textAlign="center";
+  ctx.fillStyle=elColor;
+  ctx.font="bold 13px 'Noto Serif SC',serif";
+  ctx.fillText("星期"+["日","一","二","三","四","五","六"][dateObj.getDay()],W/2,295);
+  ctx.fillStyle="#555";
+  ctx.font="13px 'Noto Sans Thai',sans-serif";
+  ctx.textAlign="right";
+  ctx.fillText("วัน"+dow,W-20,295);
+
+  // ── DIVIDER ───────────────────────────────────────────
+  ctx.strokeStyle="#E8D8C8";ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(20,318);ctx.lineTo(W-20,318);ctx.stroke();
+
+  // ── PERSONALITY CHIPS ─────────────────────────────────
+  ctx.fillStyle=elColor;
+  ctx.font="bold 13px 'Noto Sans Thai',sans-serif";
+  ctx.textAlign="left";
+  ctx.fillText("บุคลิก",20,342);
+
+  const chipW=174, chipH=32, chipGap=8, chipR=8;
+  chips.slice(0,6).forEach((chip,i)=>{
+    const col=i%2, row=Math.floor(i/2);
+    const cx=20+col*(chipW+chipGap), cy=352+row*(chipH+chipGap);
+    ctx.fillStyle="#F5EDE4";
+    roundRect(ctx,cx,cy,chipW,chipH,chipR,true,false);
+    ctx.fillStyle="#444";
+    ctx.font="13px 'Noto Sans Thai',sans-serif";
+    ctx.textAlign="center";
+    ctx.fillText(chip,cx+chipW/2,cy+chipH/2+5);
+  });
+
+  // ── COLORS ROW ────────────────────────────────────────
+  const colorY=468;
+  ctx.fillStyle=elColor;
+  ctx.font="bold 13px 'Noto Sans Thai',sans-serif";
+  ctx.textAlign="left";
+  ctx.fillText("สีเสริมธาตุ",20,colorY);
+
+  // Color circles
+  colors.forEach(({c,n},i)=>{
+    const cx=32+i*110, cy=colorY+14;
+    ctx.fillStyle=c;
+    ctx.beginPath();ctx.arc(cx,cy+22,24,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle="rgba(0,0,0,0.1)";ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.arc(cx,cy+22,24,0,Math.PI*2);ctx.stroke();
+    ctx.fillStyle="#444";
+    ctx.font="12px 'Noto Sans Thai',sans-serif";
+    ctx.textAlign="center";
+    ctx.fillText(n,cx,cy+62);
+  });
+
+  // ── COMPATIBILITY CARDS ───────────────────────────────
+  const compatY=568;
+  // Good card
+  const goodColor=EL_COLOR[compat?.good?.el||"fire"];
+  ctx.fillStyle=EL_BG[compat?.good?.el||"fire"];
+  roundRect(ctx,14,compatY,185,66,10,true,false);
+  ctx.strokeStyle=goodColor+"60";ctx.lineWidth=1.5;
+  roundRect(ctx,14,compatY,185,66,10,false,true);
+  
+  ctx.fillStyle="#444";
+  ctx.font="bold 12px 'Noto Sans Thai',sans-serif";
+  ctx.textAlign="left";
+  ctx.fillText("เข้ากันได้ดีกับ",22,compatY+20);
+  ctx.fillStyle=goodColor;
+  ctx.font="bold 14px 'Noto Sans Thai',sans-serif";
+  ctx.fillText(compat?.good?.thaiEl||"ธาตุไฟหยิน",22,compatY+42);
+  // Good icon circle
+  ctx.fillStyle=goodColor;
+  ctx.beginPath();ctx.arc(182,compatY+33,18,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#fff";ctx.font="bold 14px 'Noto Serif SC',serif";ctx.textAlign="center";
+  ctx.fillText(EL_ICON_CH[compat?.good?.el||"fire"],182,compatY+38);
+
+  // Bad card
+  const badColor=EL_COLOR[compat?.bad?.el||"earth"];
+  ctx.fillStyle="#FFF8F0";
+  roundRect(ctx,221,compatY,185,66,10,true,false);
+  ctx.strokeStyle=badColor+"60";ctx.lineWidth=1.5;
+  roundRect(ctx,221,compatY,185,66,10,false,true);
+  
+  ctx.fillStyle="#444";
+  ctx.font="bold 12px 'Noto Sans Thai',sans-serif";
+  ctx.textAlign="left";
+  ctx.fillText("เข้ากันไม่ได้กับ",229,compatY+20);
+  ctx.fillStyle=badColor;
+  ctx.font="bold 14px 'Noto Sans Thai',sans-serif";
+  ctx.fillText(compat?.bad?.thaiEl||"ธาตุดินหยาง",229,compatY+42);
+  // Bad icon circle
+  ctx.fillStyle=badColor;
+  ctx.beginPath();ctx.arc(389,compatY+33,18,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#fff";ctx.font="bold 14px 'Noto Serif SC',serif";ctx.textAlign="center";
+  ctx.fillText(EL_ICON_CH[compat?.bad?.el||"earth"],389,compatY+38);
+
+  // ── WATERMARK ─────────────────────────────────────────
+  ctx.fillStyle="#C8B8A8";
+  ctx.font="11px 'Noto Sans Thai',sans-serif";
+  ctx.textAlign="center";
+  ctx.fillText("BAZI Elements Personality by Soul Element",W/2,H-28);
+
+  // ── BOTTOM BUTTONS AREA (visual only) ─────────────────
+  ctx.fillStyle=elColor;
+  roundRect(ctx,20,H-22,160,0,8,true,false); // placeholder
+
+  // ── BORDER ────────────────────────────────────────────
+  ctx.strokeStyle=elColor+"40";ctx.lineWidth=2;
+  roundRect(ctx,1,1,W-2,H-2,16,false,true);
+}
+
+function roundRect(ctx,x,y,w,h,r,fill,stroke){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);
+  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r);
+  ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath();
+  if(fill)ctx.fill();
+  if(stroke)ctx.stroke();
+}
 
 /* ── SETTINGS FUNCTIONS ─────────────────────────── */
 function openSettings(){
@@ -1291,6 +1593,28 @@ document.addEventListener("DOMContentLoaded",()=>{
   }
 });
 </script>
+
+
+<!-- SHARE CARD MODAL -->
+<div class="modal-ov" id="share-card-modal">
+  <div class="modal-box" style="width:420px;max-width:96vw">
+    <div class="modal-hdr">
+      <span class="modal-tit">📤 แชร์การ์ดดวงปาจื้อ</span>
+      <button class="modal-cls" onclick="closeShareCard()">✕</button>
+    </div>
+    <div class="modal-bdy" style="padding:16px">
+      <div id="share-card-preview" style="display:flex;justify-content:center;margin-bottom:14px">
+        <canvas id="share-canvas" style="border-radius:16px;max-width:100%;box-shadow:0 4px 20px rgba(0,0,0,0.15)"></canvas>
+      </div>
+      <p style="font-size:0.77rem;color:#999;text-align:center;margin-bottom:12px">กดบันทึกรูป แล้วแชร์ผ่าน LINE, Facebook หรือ Social Media</p>
+    </div>
+    <div class="modal-ftr">
+      <button class="bsm bsm-out" onclick="closeShareCard()">ปิด</button>
+      <button class="bsm bsm-red" onclick="downloadShareCard()">📥 บันทึกรูป</button>
+      <button class="bsm" style="background:#25D366;color:#fff;border:none" onclick="shareCardNative()">📤 แชร์</button>
+    </div>
+  </div>
+</div>
 
 <!-- SETTINGS MODAL -->
 <div class="modal-ov" id="settings-modal">
