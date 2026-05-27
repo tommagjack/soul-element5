@@ -1130,7 +1130,13 @@ function applySharedViewMode(){
   const banner=document.createElement("div");
   banner.id="shared-banner";
   banner.style.cssText="background:#B5281C;color:#fff;text-align:center;padding:9px 16px;font-size:0.82rem;font-weight:600;letter-spacing:0.04em;position:fixed;top:0;left:0;right:0;z-index:300;";
-  banner.innerHTML="🔒 โหมดอ่านอย่างเดียว — ผลดูดวงปาจื้อ";
+  banner.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;max-width:900px;margin:0 auto">
+      <span>🔒 โหมดอ่านอย่างเดียว — ผลดูดวงปาจื้อ</span>
+      <button onclick="window.print()" style="background:rgba(255,255,255,0.2);border:1.5px solid rgba(255,255,255,0.5);color:#fff;padding:5px 14px;border-radius:7px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'Noto Sans Thai',sans-serif;transition:all 0.15s"
+        onmouseover="this.style.background='rgba(255,255,255,0.35)'"
+        onmouseout="this.style.background='rgba(255,255,255,0.2)'">🖨 พิมพ์</button>
+    </div>`;
   document.body.prepend(banner);
   // Adjust result page padding
   const rp=document.getElementById("page-result");
