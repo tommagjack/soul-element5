@@ -297,10 +297,19 @@ body::before{content:"";position:fixed;inset:0;background-image:radial-gradient(
 <!-- HISTORY -->
 <div id="page-history" class="page">
   <div class="hist-wrap">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:11px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:11px;">
       <h2 class="hist-title">🏮 ประวัติการดูดวง</h2>
-      <input class="search-bar" id="hist-search" placeholder="🔍 ค้นหาชื่อ..." oninput="renderHistory()"/>
+      <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+        <input class="search-bar" id="hist-search" placeholder="🔍 ค้นหาชื่อ..." oninput="renderHistoryTable()"/>
+        <button onclick="_historyCache=null;renderHistory()" title="ดึงข้อมูลใหม่จาก GAS"
+          style="padding:9px 14px;border-radius:9px;border:1.5px solid var(--red);background:var(--red-pale);color:var(--red);font-size:0.82rem;font-weight:700;cursor:pointer;font-family:'Noto Sans Thai',sans-serif;white-space:nowrap;transition:all 0.15s"
+          onmouseover="this.style.background='var(--red)';this.style.color='#fff'"
+          onmouseout="this.style.background='var(--red-pale)';this.style.color='var(--red)'">
+          ↺ ซิงค์ GAS
+        </button>
+      </div>
     </div>
+    <div id="hist-sync-status" style="font-size:0.78rem;margin-bottom:12px;min-height:20px"></div>
     <div class="htw">
       <table class="ht">
         <thead><tr><th style="width:38px">#</th><th>วันที่ดูดวง</th><th>ชื่อ - นามสกุล</th><th>Tag</th><th style="width:120px">จัดการ</th></tr></thead>
@@ -520,7 +529,7 @@ function goPage(n){
   document.getElementById("page-"+n).classList.add("active");
   const nb=document.getElementById("nav-"+n);if(nb)nb.classList.add("active");
   window.scrollTo(0,0);
-  if(n==="history")renderHistory();
+  if(n==="history"){_historyCache=null;renderHistory();}
   if(n==="home")renderRecent();
 }
 function refreshPage(){
@@ -624,7 +633,7 @@ function calculate(){
     const id="be-"+createdAt;
     const result={id,name,dateVal,timeVal:noTime?null:timeVal,gender,tags,bazi,pct,createdAt,expireAt,noTime};
     currentResult=result;
-    saveLocal(result);saveGAS(result).catch(()=>{});
+    saveLocal(result);updateCacheWithRecord(result);saveGAS(result).catch(()=>{});
     Swal.close();renderResult(result);goPage("result");
   },700);
 }
@@ -1003,6 +1012,16 @@ async function saveGAS(r){
   }
 }
 
+// After saving to GAS, update the local history cache too
+function updateCacheWithRecord(r){
+  if(_historyCache){
+    const existing=_historyCache.findIndex(x=>x.id===r.id);
+    if(existing>=0) _historyCache[existing]=r;
+    else _historyCache.unshift(r);
+    _historyCache.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  }
+}
+
 async function delGAS(id){
   if(!hasGas())return;
   const url=getGasUrl();
@@ -1047,7 +1066,7 @@ async function getHistoryFromGAS(){
 
 /* ── RECENT ─────────────────────────────────────── */
 function renderRecent(){
-  const hist=getLocal().slice(0,6);
+  const hist=(_historyCache||getLocal()).slice(0,6);
   const sec=document.getElementById("recent-section"),list=document.getElementById("recent-list");
   if(!hist.length){sec.style.display="none";return;}
   sec.style.display="block";
@@ -1062,31 +1081,94 @@ function renderRecent(){
 }
 
 /* ── HISTORY ────────────────────────────────────── */
+/* ── HISTORY: merge local + GAS ───────────────────── */
+let _historyCache=null;      // merged cache
+let _historyFetching=false;  // prevent double-fetch
+
+function mergeHistory(local, gas){
+  // Union by id, GAS data wins on conflict (newer/more complete)
+  const map=new Map();
+  local.forEach(r=>map.set(r.id,r));
+  gas.forEach(r=>{ if(r&&r.id) map.set(r.id,r); });
+  return [...map.values()].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+}
+
+async function syncHistoryFromGAS(){
+  if(!hasGas()||_historyFetching)return;
+  _historyFetching=true;
+  setHistSyncStatus("loading");
+  try{
+    const gasData=await getHistoryFromGAS();
+    if(gasData&&gasData.length>0){
+      // Cache all GAS records locally
+      gasData.forEach(r=>{ if(r&&r.id) saveLocal(r); });
+      _historyCache=mergeHistory(getLocal(),gasData);
+    }else{
+      _historyCache=getLocal();
+    }
+    setHistSyncStatus("ok",(_historyCache||[]).length);
+  }catch(e){
+    _historyCache=getLocal();
+    setHistSyncStatus("error");
+  }finally{
+    _historyFetching=false;
+    renderHistoryTable();
+  }
+}
+
+function setHistSyncStatus(state, count){
+  const el=document.getElementById("hist-sync-status");
+  if(!el)return;
+  if(state==="loading") el.innerHTML=`<span style="color:#B5281C">⏳ กำลังดึงข้อมูลจาก GAS...</span>`;
+  else if(state==="ok")  el.innerHTML=`<span style="color:#2e7d32">✅ ซิงค์แล้ว — ทั้งหมด ${count} รายการ</span>`;
+  else if(state==="error") el.innerHTML=`<span style="color:#888">⚠️ ไม่สามารถดึงจาก GAS — แสดงเฉพาะข้อมูลในเครื่อง</span>`;
+}
+
 function renderHistory(){
+  // First render with local data immediately (fast)
+  if(!_historyCache) _historyCache=getLocal();
+  renderHistoryTable();
+  // Then sync from GAS in background
+  syncHistoryFromGAS();
+}
+
+function renderHistoryTable(){
   const q=(document.getElementById("hist-search")?.value||"").toLowerCase();
-  const hist=getLocal().filter(r=>r.name.toLowerCase().includes(q));
+  const allHist=(_historyCache||getLocal());
+  const hist=allHist.filter(r=>r.name?.toLowerCase().includes(q));
   const total=hist.length,pages=Math.ceil(total/PER_PAGE)||1;
-  if(histPage>pages)histPage=pages;
+  if(histPage>pages)histPage=1;
   const slice=hist.slice((histPage-1)*PER_PAGE,histPage*PER_PAGE);
   const tb=document.getElementById("hist-tbody");
-  if(!total){tb.innerHTML=`<tr><td colspan="5" style="text-align:center;padding:40px;color:#bbb">ยังไม่มีประวัติการดูดวง</td></tr>`;
+  if(!total){
+    tb.innerHTML=`<tr><td colspan="5" style="text-align:center;padding:40px;color:#bbb">
+      ${_historyFetching?"⏳ กำลังโหลด...":"ยังไม่มีประวัติการดูดวง"}
+    </td></tr>`;
   }else{
     tb.innerHTML=slice.map((r,i)=>{
       const idx=(histPage-1)*PER_PAGE+i+1,el=r.bazi?.dayStem?.el||"water";
       const dt=new Date(r.createdAt).toLocaleDateString("th-TH",{year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
-      return `<tr><td style="color:#bbb;font-size:0.78rem">${idx}</td><td style="color:var(--gray);font-size:0.82rem">${dt}</td>
-      <td><div class="hn">${esc(r.name)}</div><div class="he" style="color:${EL_COLOR[el]}">${EL_ICON[el]} ${r.bazi?.dayStem?.thaiEl||""}</div></td>
-      <td style="font-size:0.77rem;color:var(--gray-lt)">${(r.tags||[]).join(", ")}</td>
-      <td><button class="hbtn hbv" onclick="viewHist('${r.id}')">ดูผล</button><button class="hbtn hbd" onclick="delHist('${r.id}')">ลบ</button></td></tr>`;
+      return `<tr>
+        <td style="color:#bbb;font-size:0.78rem">${idx}</td>
+        <td style="color:var(--gray);font-size:0.82rem">${dt}</td>
+        <td><div class="hn">${esc(r.name)}</div><div class="he" style="color:${EL_COLOR[el]}">${EL_ICON[el]} ${r.bazi?.dayStem?.thaiEl||""}</div></td>
+        <td style="font-size:0.77rem;color:var(--gray-lt)">${(r.tags||[]).join(", ")}</td>
+        <td>
+          <button class="hbtn hbv" onclick="viewHist('${r.id}')">ดูผล</button>
+          <button class="hbtn hbd" onclick="delHist('${r.id}')">ลบ</button>
+        </td>
+      </tr>`;
     }).join("");
   }
   document.getElementById("hist-count").textContent=total?"ทั้งหมด "+total+" รายการ":"";
   const pw=document.getElementById("pagination-wrap");
   if(pages<=1){pw.innerHTML="";return;}
-  pw.innerHTML=`<div class="pagination">${Array.from({length:pages},(_,i)=>`<button class="pgbtn${i+1===histPage?" active":""}" onclick="histPage=${i+1};renderHistory()">${i+1}</button>`).join("")}</div>`;
+  pw.innerHTML=`<div class="pagination">${Array.from({length:pages},(_,i)=>
+    `<button class="pgbtn${i+1===histPage?" active":""}" onclick="histPage=${i+1};renderHistoryTable()">${i+1}</button>`
+  ).join("")}</div>`;
 }
 function viewHist(id){const r=getLocal().find(x=>x.id===id);if(!r)return toast2("error","ไม่พบข้อมูล");currentResult=r;renderResult(r);goPage("result");}
-function delHist(id){Swal.fire({title:"<span style=\"color:var(--red)\">ยืนยันการลบ?</span>",html:"<span style=\"color:#888\">ข้อมูลจะถูกลบออกถาวร</span>",icon:"warning",showCancelButton:true,confirmButtonText:"ลบ",cancelButtonText:"ยกเลิก",confirmButtonColor:"#B5281C",background:"#fff",customClass:{popup:"swal-cn"}}).then(res=>{if(res.isConfirmed){delLocal(id);delGAS(id).catch(()=>{});renderHistory();toast2("success","ลบข้อมูลแล้ว");}});}
+function delHist(id){Swal.fire({title:"<span style=\"color:var(--red)\">ยืนยันการลบ?</span>",html:"<span style=\"color:#888\">ข้อมูลจะถูกลบออกถาวร</span>",icon:"warning",showCancelButton:true,confirmButtonText:"ลบ",cancelButtonText:"ยกเลิก",confirmButtonColor:"#B5281C",background:"#fff",customClass:{popup:"swal-cn"}}).then(res=>{if(res.isConfirmed){delLocal(id);delGAS(id).catch(()=>{});_historyCache=null;syncHistoryFromGAS();toast2("success","ลบข้อมูลแล้ว");}});}
 
 /* ── SHARE ──────────────────────────────────────── */
 function shareLink(id){const url=window.location.origin+window.location.pathname+"?id="+id;if(navigator.share)navigator.share({title:"Soul Element",url}).catch(()=>{});else navigator.clipboard.writeText(url).then(()=>toast2("success","คัดลอกลิงก์แล้ว!")).catch(()=>toast2("error","คัดลอกไม่สำเร็จ"));}
