@@ -524,14 +524,14 @@ let currentResult  = null;
 let radarChart     = null;
 let countdownInt   = null;
 let histPage       = 1;
-const PER_PAGE     = 20;
+const PER_PAGE = 20;
 const GAS_URL      = "https://script.google.com/macros/s/AKfycbyFujaCpOl3nh7a4tbVcHPn0dO7mzoYvmKtLDlk5s5qghpuIWMKU5l2jxIdQlWnD2Y/exec";
 const IS_SHARED_VIEW = !!new URLSearchParams(window.location.search).get("id");
 
 /* ── GAS API ─────────────────────────────────────── */
 // GAS เป็น single source of truth — ดึงตรงทุกครั้ง
 // JSONP loader — bypasses CORS completely (works with any GAS Web App)
-function gasJsonp(params = {}, timeoutMs = 15000) {
+function gasJsonp(params = {}, timeoutMs = 20000) {
   return new Promise((resolve, reject) => {
     const gasUrl = localStorage.getItem("soulElementGasUrl") || GAS_URL;
     const cbName = "_gasCallback_" + Date.now() + "_" + Math.random().toString(36).slice(2);
@@ -542,7 +542,7 @@ function gasJsonp(params = {}, timeoutMs = 15000) {
 
     const timer = setTimeout(() => {
       cleanup();
-      reject(new Error("GAS JSONP timeout"));
+      reject(new Error("JSONP timeout after " + timeoutMs + "ms"));
     }, timeoutMs);
 
     function cleanup() {
@@ -616,10 +616,27 @@ async function saveToGAS(r)   { try { await gasPost({ action: "saveResult",   da
 async function deleteFromGAS(id) { try { await gasPost({ action: "deleteResult", id       }); } catch(e) { console.warn("deleteFromGAS:", e.message); } }
 
 async function getResultFromGAS(id) {
+  // Try JSONP first, then direct fetch
   try {
     const data = await gasGet({ action: "getResult", id });
     return (data && data.id && data.bazi) ? data : null;
-  } catch(e) { console.warn("getResultFromGAS:", e.message); return null; }
+  } catch(e) {
+    console.warn("getResultFromGAS gasGet failed:", e.message);
+    // Final fallback: plain fetch without any special headers
+    try {
+      const gasUrl = localStorage.getItem("soulElementGasUrl") || GAS_URL;
+      const url = gasUrl + "?action=getResult&id=" + encodeURIComponent(id) + "&t=" + Date.now();
+      const res = await fetch(url);
+      if(!res.ok) throw new Error("HTTP " + res.status);
+      const text = await res.text();
+      if(!text || text === "null") return null;
+      const data = JSON.parse(text);
+      return (data && data.id && data.bazi) ? data : null;
+    } catch(e2) {
+      console.warn("getResultFromGAS fetch fallback failed:", e2.message);
+      throw e2; // propagate so retry logic can retry
+    }
+  }
 }
 
 async function getHistoryFromGAS() {
@@ -1105,6 +1122,8 @@ async function loadHistory() {
     const data = await getHistoryFromGAS();
     // cache ลง local เพื่อให้ viewHist ใช้ได้แบบ offline
     data.forEach(r => { if(r && r.id) saveLocal(r); });
+    // Ensure newest first
+    data.sort((a,b)=>(Number(b.createdAt)||0)-(Number(a.createdAt)||0));
     _lastHistData = data;
     setHistStatus("ok", data.length);
     renderHistoryTable(data, false);
@@ -1165,6 +1184,16 @@ function renderHistoryTable(data, loading) {
         <td>
           <div class="hn">${esc(r.name)}</div>
           <div class="he" style="color:${EL_COLOR[el]}">${EL_ICON[el]} ${r.bazi?.dayStem?.thaiEl || ""}</div>
+          ${(()=>{
+            const pct=r.pct||{};
+            const elOrd=["wood","fire","earth","metal","water"];
+            const boost=elOrd.map(e=>({el:e,pct:pct[e]||0})).sort((a,b)=>a.pct-b.pct)[0];
+            if(!boost||!boost.el)return "";
+            return `<div style="font-size:0.69rem;color:${EL_COLOR[boost.el]};margin-top:2px;display:flex;align-items:center;gap:3px">
+              <span style="font-family:'Noto Serif TC',serif">${EL_ICON_CH[boost.el]}</span>
+              <span>ควรเสริม: ธาตุ${EL_THAI[boost.el]} (${boost.pct}%)</span>
+            </div>`;
+          })()}
         </td>
         <td style="font-size:0.77rem;color:var(--gray-lt)">${(r.tags || []).join(", ")}</td>
         <td>
@@ -1393,18 +1422,47 @@ async function checkSharedLink(){
   }
 }
 
-function showSharedNotFound(id,isError=false){
+function showSharedNotFound(id, isError=false){
   document.getElementById("result-wrap").innerHTML=`
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;padding:32px;text-align:center">
-      <div style="font-size:3.5rem">${isError?"⚠️":"🔍"}</div>
-      <div style="font-size:1.3rem;font-weight:700;color:#B5281C;font-family:'Ma Shan Zheng',serif">${isError?"เกิดข้อผิดพลาด":"ไม่พบข้อมูล"}</div>
-      <div style="color:#888;font-size:0.88rem;line-height:1.8;max-width:320px">
+      <div style="font-size:3.5rem">${isError?"🔄":"🔍"}</div>
+      <div style="font-size:1.2rem;font-weight:700;color:#B5281C;font-family:'Ma Shan Zheng',serif">${isError?"ดึงข้อมูลไม่สำเร็จ":"ไม่พบข้อมูล"}</div>
+      <div style="color:#666;font-size:0.86rem;line-height:1.9;max-width:340px">
         ${isError
-          ?"ไม่สามารถดึงข้อมูลได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต"
-          :"ลิงก์นี้หมดอายุแล้วหรือไม่มีในระบบ<br>ข้อมูลจะถูกลบหลังจาก 7 วัน"}
+          ?`กำลังโหลดข้อมูลผลดูดวง...<br>
+            <span style="font-size:0.8rem;color:#999">หากรอนานเกินไป กรุณากดปุ่มลองใหม่</span>`
+          :"ลิงก์นี้หมดอายุแล้วหรือไม่มีในระบบ<br><span style='font-size:0.8rem;color:#bbb'>ข้อมูลจะถูกลบหลังจาก 7 วัน</span>"}
       </div>
-      <div style="font-size:0.74rem;color:#ccc;background:#f9f9f9;padding:6px 14px;border-radius:8px;font-family:monospace">ID: ${id}</div>
+      ${isError?`<button onclick="retrySharedLink('${id}')"
+        style="background:#B5281C;color:#fff;border:none;padding:12px 28px;border-radius:10px;font-size:0.9rem;font-weight:700;cursor:pointer;font-family:'Noto Sans Thai',sans-serif;box-shadow:0 4px 14px rgba(181,40,28,0.3)">
+        ↺ ลองอีกครั้ง
+      </button>`:""}
+      <div style="font-size:0.72rem;color:#ccc;background:#f9f9f9;padding:6px 14px;border-radius:8px;font-family:monospace">ID: ${id}</div>
     </div>`;
+}
+
+async function retrySharedLink(id){
+  // Show loading
+  document.getElementById("result-wrap").innerHTML=`
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px">
+      <div style="font-size:3rem;font-family:'Noto Serif TC',serif;color:#B5281C">命</div>
+      <div style="font-size:1rem;color:#888">กำลังโหลดผลดูดวง...</div>
+      <div style="width:40px;height:40px;border:3px solid #f0e8e8;border-top-color:#B5281C;border-radius:50%;animation:spin360 0.8s linear infinite"></div>
+    </div>`;
+  // Retry up to 3 times with backoff
+  let r = null, lastErr = null;
+  for(let attempt = 1; attempt <= 3; attempt++){
+    try {
+      r = await getResultFromGAS(id);
+      if(r) break;
+    } catch(e) {
+      lastErr = e;
+      console.warn("getResult attempt " + attempt + "/3:", e.message);
+      if(attempt < 3) await new Promise(res => setTimeout(res, 1500 * attempt));
+    }
+  }
+  if(r){ saveLocal(r); currentResult=r; renderResult(r); hideActionRowForShared(); }
+  else  showSharedNotFound(id, !!lastErr);
 }
 
 /* ── FORM HELPERS ───────────────────────────────── */
