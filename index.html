@@ -530,69 +530,52 @@ const IS_SHARED_VIEW = !!new URLSearchParams(window.location.search).get("id");
 
 /* ── GAS API ─────────────────────────────────────── */
 // GAS เป็น single source of truth — ดึงตรงทุกครั้ง
-// JSONP loader — bypasses CORS completely (works with any GAS Web App)
-function gasJsonp(params = {}, timeoutMs = 20000) {
+// Build GAS URL with params + cache-busting
+function buildGasUrl(params = {}) {
+  const gasUrl = localStorage.getItem("soulElementGasUrl") || GAS_URL;
+  const url = new URL(gasUrl);
+  Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+  url.searchParams.set("t", Date.now());
+  return url.toString();
+}
+
+// Primary: plain fetch — fast, works with GAS "Access: Anyone" CORS
+async function gasFetch(params = {}) {
+  const res  = await fetch(buildGasUrl(params), { method: "GET", redirect: "follow" });
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  const text = await res.text();
+  if (!text || text === "null") return null;
+  return JSON.parse(text);
+}
+
+// Fallback: JSONP via <script> tag — bypasses CORS, needs Code.gs with callback support
+function gasJsonp(params = {}, timeoutMs = 15000) {
   return new Promise((resolve, reject) => {
-    const gasUrl = localStorage.getItem("soulElementGasUrl") || GAS_URL;
-    const cbName = "_gasCallback_" + Date.now() + "_" + Math.random().toString(36).slice(2);
-    const url    = new URL(gasUrl);
-    Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
-    url.searchParams.set("callback", cbName);
-    url.searchParams.set("t", Date.now());
-
-    const timer = setTimeout(() => {
-      cleanup();
-      reject(new Error("JSONP timeout after " + timeoutMs + "ms"));
-    }, timeoutMs);
-
+    const cbName = "_cb_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+    const url = buildGasUrl({ ...params, callback: cbName });
+    const timer = setTimeout(() => { cleanup(); reject(new Error("JSONP timeout")); }, timeoutMs);
     function cleanup() {
       clearTimeout(timer);
       delete window[cbName];
       const el = document.getElementById(cbName);
       if (el) el.remove();
     }
-
-    window[cbName] = function(data) {
-      cleanup();
-      resolve(data);
-    };
-
-    const script = document.createElement("script");
-    script.id  = cbName;
-    script.src = url.toString();
-    script.onerror = function() {
-      cleanup();
-      reject(new Error("GAS script load error"));
-    };
+    window[cbName] = (data) => { cleanup(); resolve(data); };
+    const script = Object.assign(document.createElement("script"), {
+      id: cbName, src: url,
+      onerror: () => { cleanup(); reject(new Error("JSONP load error")); }
+    });
     document.head.appendChild(script);
   });
 }
 
-// Regular fetch fallback (works if GAS has CORS configured)
-async function gasFetch(params = {}) {
-  const gasUrl = localStorage.getItem("soulElementGasUrl") || GAS_URL;
-  const url    = new URL(gasUrl);
-  Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
-  url.searchParams.set("t", Date.now());
-  const res  = await fetch(url.toString(), { method: "GET", redirect: "follow" });
-  if (!res.ok) throw new Error("GAS fetch failed: " + res.status);
-  const text = await res.text();
-  if (!text || text === "null") return null;
-  return JSON.parse(text);
-}
-
-// gasGet: try JSONP first (bypasses CORS), fallback to fetch
+// gasGet: fetch first (fast) → JSONP fallback (no CORS needed)
 async function gasGet(params = {}) {
   try {
-    const data = await gasJsonp(params);
-    return data;
+    return await gasFetch(params);
   } catch(e1) {
-    console.warn("gasGet JSONP failed:", e1.message, "— trying fetch...");
-    try {
-      return await gasFetch(params);
-    } catch(e2) {
-      throw new Error("gasGet failed: " + e2.message);
-    }
+    console.warn("gasFetch failed (" + e1.message + "), trying JSONP...");
+    return await gasJsonp(params);
   }
 }
 
@@ -616,27 +599,8 @@ async function saveToGAS(r)   { try { await gasPost({ action: "saveResult",   da
 async function deleteFromGAS(id) { try { await gasPost({ action: "deleteResult", id       }); } catch(e) { console.warn("deleteFromGAS:", e.message); } }
 
 async function getResultFromGAS(id) {
-  // Try JSONP first, then direct fetch
-  try {
-    const data = await gasGet({ action: "getResult", id });
-    return (data && data.id && data.bazi) ? data : null;
-  } catch(e) {
-    console.warn("getResultFromGAS gasGet failed:", e.message);
-    // Final fallback: plain fetch without any special headers
-    try {
-      const gasUrl = localStorage.getItem("soulElementGasUrl") || GAS_URL;
-      const url = gasUrl + "?action=getResult&id=" + encodeURIComponent(id) + "&t=" + Date.now();
-      const res = await fetch(url);
-      if(!res.ok) throw new Error("HTTP " + res.status);
-      const text = await res.text();
-      if(!text || text === "null") return null;
-      const data = JSON.parse(text);
-      return (data && data.id && data.bazi) ? data : null;
-    } catch(e2) {
-      console.warn("getResultFromGAS fetch fallback failed:", e2.message);
-      throw e2; // propagate so retry logic can retry
-    }
-  }
+  const data = await gasGet({ action: "getResult", id });
+  return (data && data.id && data.bazi) ? data : null;
 }
 
 async function getHistoryFromGAS() {
@@ -1464,20 +1428,14 @@ async function retrySharedLink(id){
       <div style="font-size:1rem;color:#888">กำลังโหลดผลดูดวง...</div>
       <div style="width:40px;height:40px;border:3px solid #f0e8e8;border-top-color:#B5281C;border-radius:50%;animation:spin360 0.8s linear infinite"></div>
     </div>`;
-  // Retry up to 3 times with backoff
-  let r = null, lastErr = null;
-  for(let attempt = 1; attempt <= 3; attempt++){
-    try {
-      r = await getResultFromGAS(id);
-      if(r) break;
-    } catch(e) {
-      lastErr = e;
-      console.warn("getResult attempt " + attempt + "/3:", e.message);
-      if(attempt < 3) await new Promise(res => setTimeout(res, 1500 * attempt));
-    }
+  try {
+    const r = await getResultFromGAS(id);
+    if(r){ saveLocal(r); currentResult=r; renderResult(r); hideActionRowForShared(); }
+    else  showSharedNotFound(id, false);
+  } catch(e) {
+    console.warn("checkSharedLink error:", e.message);
+    showSharedNotFound(id, true);
   }
-  if(r){ saveLocal(r); currentResult=r; renderResult(r); hideActionRowForShared(); }
-  else  showSharedNotFound(id, !!lastErr);
 }
 
 /* ── FORM HELPERS ───────────────────────────────── */
