@@ -219,6 +219,7 @@ body::before{content:"";position:fixed;inset:0;background-image:radial-gradient(
 .fu{animation:fadeUp 0.38s ease forwards;}
 .fu1{animation-delay:0.05s;opacity:0;}.fu2{animation-delay:0.1s;opacity:0;}.fu3{animation-delay:0.16s;opacity:0;}
 @keyframes spin{to{transform:rotate(360deg);}}
+@keyframes spin360{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 .spin{animation:spin 0.6s linear;}
 
 /* PRINT */
@@ -245,7 +246,7 @@ body::before{content:"";position:fixed;inset:0;background-image:radial-gradient(
     <div class="nav-links">
       <button class="nav-btn" id="nav-home" onclick="goPage('home')">ดูดวง</button>
       <button class="nav-btn" id="nav-history" onclick="goPage('history')">ประวัติ</button>
-      <button class="nav-btn" onclick="openSettings()" title="ตั้งค่า GAS URL" style="padding:6px 12px;font-size:1rem">⚙</button>
+      <button class="nav-btn" onclick="openSettings()" title="ตั้งค่า GAS URL" style="padding:6px 12px;font-size:1rem" id="nav-settings">⚙</button>
       <button class="nav-refresh" onclick="refreshPage()" title="รีเฟรช">↺</button>
     </div>
   </div>
@@ -487,7 +488,7 @@ const DM_COLORS={
 let currentResult=null, radarChart=null, countdownInt=null, histPage=1;
 const PER_PAGE=20;
 // GAS URL stored in localStorage so admin can configure via UI
-function getGasUrl(){return localStorage.getItem("soulElementGasUrl")||"";}
+function getGasUrl(){return localStorage.getItem("soulElementGasUrl")||"https://script.google.com/macros/s/AKfycbyFujaCpOl3nh7a4tbVcHPn0dO7mzoYvmKtLDlk5s5qghpuIWMKU5l2jxIdQlWnD2Y/exec";}
 function setGasUrl(u){localStorage.setItem("soulElementGasUrl",u.trim());}
 function hasGas(){const u=getGasUrl();return u&&u.startsWith("https://");}
 
@@ -607,6 +608,16 @@ function calculate(){
   },700);
 }
 
+function buildActionRow(rid){
+  return `<div class="action-row no-print fu fu1">
+    <button class="abtn abtn-back" onclick="goPage('home')">← กลับหน้าแรก</button>
+    <button class="abtn" onclick="window.print()">🖨 พิมพ์ A4</button>
+    <button class="abtn" onclick="openQr()">🔖 QR Code</button>
+    <button class="abtn" onclick="shareLink('${rid}')">🔗 แชร์ลิงก์</button>
+    <button class="abtn no-print" onclick="refreshPage()" style="margin-left:auto">↺ รีเฟรช</button>
+  </div>`;
+}
+
 /* ── RENDER RESULT ──────────────────────────────── */
 function renderResult(r){
   if(radarChart){try{radarChart.destroy();}catch(e){}radarChart=null;}
@@ -648,19 +659,10 @@ function renderResult(r){
       <div><div style="font-size:0.69rem;opacity:0.8">Day Master</div><div>${dm.thaiEl}</div></div>
     </div>
   </div>
-  <div class="cdown no-print">
-    <span class="cdown-lbl">⏳ ข้อมูลหมดอายุใน</span>
-    <span class="cdown-timer" id="ctimer">กำลังโหลด...</span>
-  </div>
+  ${IS_SHARED_VIEW?"":'<div class="cdown no-print"><span class="cdown-lbl">⏳ ข้อมูลหมดอายุใน</span><span class="cdown-timer" id="ctimer">กำลังโหลด...</span></div>'}
 </div>
 
-<div class="action-row no-print fu fu1">
-  <button class="abtn abtn-back" onclick="goPage('home')">← กลับหน้าแรก</button>
-  <button class="abtn" onclick="window.print()">🖨 พิมพ์ A4</button>
-  <button class="abtn" onclick="openQr()">🔖 QR Code</button>
-  <button class="abtn" onclick="shareLink('${r.id}')">🔗 แชร์ลิงก์</button>
-  <button class="abtn no-print" onclick="refreshPage()" style="margin-left:auto">↺ รีเฟรช</button>
-</div>
+${IS_SHARED_VIEW?"":buildActionRow(r.id)}
 
 <!-- PILLARS TABLE -->
 <div class="scard fu fu2">
@@ -964,19 +966,18 @@ function delLocal(id){try{localStorage.setItem("baziHistory",JSON.stringify(getL
 async function saveGAS(r){
   if(!hasGas())return;
   const url=getGasUrl();
+  // Use text/plain to avoid CORS preflight - GAS accepts this
   try{
-    // Try CORS mode first (requires GAS doPost to return proper headers)
-    const res=await fetch(url+"?nocache="+Date.now(),{
+    await fetch(url,{
       method:"POST",
-      headers:{"Content-Type":"text/plain"},
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
       body:JSON.stringify({action:"saveResult",data:r})
     });
-    if(!res.ok)throw new Error("non-ok");
   }catch(e){
-    // Fallback no-cors (fire-and-forget, no response reading)
-    try{await fetch(url,{method:"POST",mode:"no-cors",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({action:"saveResult",data:r})});}catch(e2){}
+    // Silent fail - GAS might have saved it anyway (no-cors fallback)
+    try{
+      navigator.sendBeacon(url,JSON.stringify({action:"saveResult",data:r}));
+    }catch(e2){}
   }
 }
 
@@ -992,23 +993,35 @@ async function getFromGAS(id){
   if(!hasGas())return null;
   const url=getGasUrl();
   try{
-    const res=await fetch(url+"?action=getResult&id="+encodeURIComponent(id)+"&nocache="+Date.now());
+    // GET with cache-busting
+    const res=await fetch(
+      url+"?action=getResult&id="+encodeURIComponent(id)+"&t="+Date.now(),
+      {method:"GET",cache:"no-store"}
+    );
     if(!res.ok)return null;
-    const data=await res.json();
-    return data&&data.id?data:null;
-  }catch(e){return null;}
+    const text=await res.text();
+    if(!text||text==="null")return null;
+    const data=JSON.parse(text);
+    // Validate: must have id and bazi fields
+    return (data&&data.id&&data.bazi)?data:null;
+  }catch(e){
+    console.warn("getFromGAS error:",e.message);
+    return null;
+  }
 }
 
 async function getHistoryFromGAS(){
   if(!hasGas())return [];
   const url=getGasUrl();
   try{
-    const res=await fetch(url+"?action=getHistory&nocache="+Date.now());
+    const res=await fetch(url+"?action=getHistory&t="+Date.now(),{method:"GET",cache:"no-store"});
     if(!res.ok)return [];
     const data=await res.json();
     return Array.isArray(data)?data:[];
   }catch(e){return [];}
 }
+
+
 
 /* ── RECENT ─────────────────────────────────────── */
 function renderRecent(){
@@ -1092,55 +1105,88 @@ function downloadSlip(){const c=document.getElementById("slip-canvas"),a=documen
 /* ── SHARED LINK ────────────────────────────────── */
 function hideActionRowForShared(){
   setTimeout(()=>{
-    const ar=document.querySelector(".action-row");
-    if(ar)ar.style.display="none";
-    // Also hide refresh btn
-    const rb=document.querySelector(".nav-refresh");
-    if(rb)rb.style.display="none";
-  },200);
+    // Hide ALL action/navigation elements in shared view
+    document.querySelectorAll(".action-row,.no-print,.cdown").forEach(el=>{
+      if(el)el.style.display="none";
+    });
+    // Hide countdown bar specifically
+    const cd=document.getElementById("ctimer");
+    if(cd)cd.closest(".cdown")?.remove();
+  },300);
+}
+
+/* ── IS SHARED VIEW? ──────────────────────────────── */
+const IS_SHARED_VIEW = !!new URLSearchParams(window.location.search).get("id");
+
+function applySharedViewMode(){
+  // Hide entire navbar
+  const nav=document.getElementById("navbar");
+  if(nav)nav.style.display="none";
+  // All pages hidden except result
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById("page-result").classList.add("active");
+  // Action row already hidden in renderResult for shared
+  // Add "view only" banner
+  const banner=document.createElement("div");
+  banner.id="shared-banner";
+  banner.style.cssText="background:#B5281C;color:#fff;text-align:center;padding:9px 16px;font-size:0.82rem;font-weight:600;letter-spacing:0.04em;position:fixed;top:0;left:0;right:0;z-index:300;";
+  banner.innerHTML="🔒 โหมดอ่านอย่างเดียว — ผลดูดวงปาจื้อ";
+  document.body.prepend(banner);
+  // Adjust result page padding
+  const rp=document.getElementById("page-result");
+  if(rp)rp.style.paddingTop="46px";
 }
 
 async function checkSharedLink(){
   const id=new URLSearchParams(window.location.search).get("id");
   if(!id)return;
 
-  // 1. Check localStorage first (fast)
+  // Apply shared UI immediately
+  applySharedViewMode();
+  document.getElementById("page-result").style.paddingTop="46px";
+
+  // Show loading in result area
+  document.getElementById("result-wrap").innerHTML=`
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px">
+      <div style="font-size:3rem;font-family:'Noto Serif SC',serif;color:#B5281C">命</div>
+      <div style="font-size:1rem;color:#888;font-family:'Noto Sans Thai',sans-serif">กำลังโหลดผลดูดวง...</div>
+      <div style="width:40px;height:40px;border:3px solid #f0e8e8;border-top-color:#B5281C;border-radius:50%;animation:spin360 0.8s linear infinite"></div>
+    </div>`;
+
+  // 1. Check localStorage first
   const local=getLocal().find(x=>x.id===id);
   if(local){
-    currentResult=local;renderResult(local);goPage("result");
+    currentResult=local;renderResult(local);
     hideActionRowForShared();return;
   }
 
-  // 2. Show loading while fetching from GAS
-  Swal.fire({
-    title:"<span style=\"color:#B5281C;font-family:'Ma Shan Zheng',serif\">กำลังโหลดข้อมูล...</span>",
-    html:"<div style=\"color:#888;font-size:0.84rem\">ดึงข้อมูลจากระบบ กรุณารอสักครู่</div>",
-    allowOutsideClick:false,showConfirmButton:false,background:"#fff",
-    customClass:{popup:"swal-cn"},didOpen:()=>Swal.showLoading()
-  });
-
+  // 2. Fetch from GAS
   try{
     const gasResult=await getFromGAS(id);
-    Swal.close();
     if(gasResult){
-      saveLocal(gasResult); // cache locally for next time
-      currentResult=gasResult;renderResult(gasResult);goPage("result");
+      saveLocal(gasResult);
+      currentResult=gasResult;renderResult(gasResult);
       hideActionRowForShared();
     }else{
-      // 3. Not found anywhere
-      Swal.fire({
-        title:"<span style=\"color:#B5281C\">ไม่พบข้อมูล</span>",
-        html:"<div style=\"color:#888;font-size:0.88rem\">ลิงก์นี้หมดอายุหรือไม่มีในระบบ<br><span style=\"font-size:0.8rem;color:#bbb\">ID: "+id+"</span></div>",
-        background:"#fff",customClass:{popup:"swal-cn"},icon:"warning",
-        confirmButtonColor:"#B5281C"
-      });
+      showSharedNotFound(id);
     }
   }catch(e){
-    Swal.close();
-    Swal.fire({title:"<span style=\"color:#B5281C\">เชื่อมต่อไม่ได้</span>",
-      html:"<div style=\"color:#888;font-size:0.88rem\">ไม่สามารถดึงข้อมูลจาก GAS ได้<br>กรุณาตรวจสอบ GAS URL ในการตั้งค่า</div>",
-      background:"#fff",customClass:{popup:"swal-cn"},icon:"error",confirmButtonColor:"#B5281C"});
+    showSharedNotFound(id,true);
   }
+}
+
+function showSharedNotFound(id,isError=false){
+  document.getElementById("result-wrap").innerHTML=`
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;padding:32px;text-align:center">
+      <div style="font-size:3.5rem">${isError?"⚠️":"🔍"}</div>
+      <div style="font-size:1.3rem;font-weight:700;color:#B5281C;font-family:'Ma Shan Zheng',serif">${isError?"เกิดข้อผิดพลาด":"ไม่พบข้อมูล"}</div>
+      <div style="color:#888;font-size:0.88rem;line-height:1.8;max-width:320px">
+        ${isError
+          ?"ไม่สามารถดึงข้อมูลได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต"
+          :"ลิงก์นี้หมดอายุแล้วหรือไม่มีในระบบ<br>ข้อมูลจะถูกลบหลังจาก 7 วัน"}
+      </div>
+      <div style="font-size:0.74rem;color:#ccc;background:#f9f9f9;padding:6px 14px;border-radius:8px;font-family:monospace">ID: ${id}</div>
+    </div>`;
 }
 
 /* ── FORM HELPERS ───────────────────────────────── */
@@ -1222,7 +1268,9 @@ document.addEventListener("DOMContentLoaded",()=>{
     localStorage.setItem("baziVer",VER);
   }
   document.getElementById("inp-date").valueAsDate=new Date();
-  goPage("home");
+  if(!IS_SHARED_VIEW){
+    goPage("home");
+  }
   // checkSharedLink is async - call it properly
   checkSharedLink().catch(()=>{});
   // Show GAS config reminder if not set and no ?id param
