@@ -5,223 +5,168 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Soul Element — ปาจื้อดูดวง</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;700&family=Noto+Serif+SC:wght@400;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;700&family=Noto+Serif+TC:wght@400;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 :root{
   --red:#B5281C;--red2:#D93025;--red3:#7B1A12;
-  --red-light:#F9DEDD;--red-pale:#FEF6F5;
+  --red-light:#F9DEDD;--red-pale:#FEF9F9;
   --white:#FFFFFF;--bg:#F5F0EC;
-  --black:#1C1C1C;--gray:#5A5A5A;--gray-lt:#9A9A9A;--gray-bd:#DEDEDE;
-  --wood:#3D7A4B;--fire:#C0392B;--earth:#9C7A2E;--metal:#8B7355;--water:#2C5282;
+  --black:#1C1C1C;--gray:#555;--gray-lt:#999;--gray-bd:#DEDEDE;
+  --wood:#16a34a;--fire:#dc2626;--earth:#92400e;--metal:#b45309;--water:#1d4ed8;
   --wood-bg:#EBF5ED;--fire-bg:#FDECEA;--earth-bg:#FDF5E0;--metal-bg:#F5F0E8;--water-bg:#EBF0FA;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
-body{background:var(--bg);color:var(--black);font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;min-height:100vh;overflow-x:hidden;}
-
-/* BG PATTERN */
-body::before{content:"";position:fixed;inset:0;background-image:radial-gradient(ellipse 80% 35% at 50% 0%,rgba(181,40,28,0.07) 0%,transparent 60%),url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='rgba(181,40,28,0.04)' stroke-width='1'%3E%3Crect x='8' y='8' width='64' height='64'/%3E%3Crect x='20' y='20' width='40' height='40'/%3E%3Ccircle cx='40' cy='40' r='20'/%3E%3C/g%3E%3C/svg%3E");pointer-events:none;z-index:0;}
-
+body{background:var(--bg);color:var(--black);font-family:"Noto Sans Thai","Noto Sans TC",sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:"";position:fixed;inset:0;background-image:radial-gradient(ellipse 80% 35% at 50% 0%,rgba(181,40,28,0.07) 0%,transparent 60%),url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='rgba(181,40,28,0.04)' stroke-width='1'%3E%3Crect x='8' y='8' width='64' height='64'/%3E%3Crect x='20' y='20' width='40' height='40'/%3E%3C/g%3E%3C/svg%3E");pointer-events:none;z-index:0;}
 /* NAVBAR */
 #navbar{position:fixed;top:0;left:0;right:0;z-index:200;background:var(--red);border-bottom:3px solid var(--red3);box-shadow:0 2px 16px rgba(181,40,28,0.3);}
 .nav-inner{max-width:1080px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:56px;}
-.logo{font-family:"Ma Shan Zheng",serif;font-size:1.4rem;color:#fff;display:flex;align-items:center;gap:10px;text-decoration:none;}
-.logo-zh{font-size:1.6rem;opacity:0.9;}
-.logo-sub{font-size:0.67rem;color:rgba(255,255,255,0.65);font-family:"Noto Sans SC",sans-serif;letter-spacing:0.12em;display:block;margin-top:-3px;}
+.logo{font-family:"Ma Shan Zheng",serif;font-size:1.4rem;color:#fff;display:flex;align-items:center;gap:10px;}
+.logo-zh{font-size:1.6rem;opacity:.9;}
+.logo-sub{font-size:.67rem;color:rgba(255,255,255,.65);font-family:"Noto Sans TC",sans-serif;letter-spacing:.12em;display:block;margin-top:-3px;}
 .nav-links{display:flex;gap:5px;align-items:center;}
-.nav-btn{padding:6px 16px;border-radius:6px;font-size:0.81rem;font-weight:600;cursor:pointer;border:1.5px solid rgba(255,255,255,0.35);background:transparent;color:rgba(255,255,255,0.88);font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;transition:all 0.18s;}
+.nav-btn{padding:6px 16px;border-radius:6px;font-size:.81rem;font-weight:600;cursor:pointer;border:1.5px solid rgba(255,255,255,.35);background:transparent;color:rgba(255,255,255,.88);font-family:"Noto Sans Thai","Noto Sans TC",sans-serif;transition:all .18s;}
 .nav-btn:hover,.nav-btn.active{background:#fff;color:var(--red);border-color:#fff;}
-.nav-refresh{padding:6px 10px;border-radius:6px;font-size:0.9rem;cursor:pointer;border:1.5px solid rgba(255,255,255,0.35);background:transparent;color:rgba(255,255,255,0.88);transition:all 0.18s;display:flex;align-items:center;}
+.nav-refresh{padding:6px 10px;border-radius:6px;font-size:.9rem;cursor:pointer;border:1.5px solid rgba(255,255,255,.35);background:transparent;color:rgba(255,255,255,.88);transition:all .18s;display:flex;align-items:center;}
 .nav-refresh:hover{background:#fff;color:var(--red);}
-
 /* PAGES */
 .page{display:none;min-height:calc(100vh - 56px);padding-top:56px;position:relative;z-index:1;}
 .page.active{display:block;}
 #page-home.active{display:flex;align-items:flex-start;justify-content:center;padding:60px 20px 60px;}
-
 /* HOME */
 .home-wrap{width:100%;max-width:600px;padding-top:16px;}
-.hero-badge{display:inline-flex;align-items:center;gap:7px;background:var(--red-light);color:var(--red3);padding:5px 15px;border-radius:20px;font-size:0.76rem;font-weight:700;letter-spacing:0.08em;margin-bottom:14px;border:1px solid rgba(181,40,28,0.2);}
+.hero-badge{display:inline-flex;align-items:center;gap:7px;background:var(--red-light);color:var(--red3);padding:5px 15px;border-radius:20px;font-size:.76rem;font-weight:700;letter-spacing:.08em;margin-bottom:14px;border:1px solid rgba(181,40,28,.2);}
 .hero-title{font-family:"Ma Shan Zheng",serif;font-size:clamp(2.2rem,7vw,3.6rem);color:var(--red);line-height:1.1;margin-bottom:4px;}
 .hero-title span{color:var(--black);}
-.hero-sub{color:var(--gray-lt);font-size:0.86rem;margin-bottom:28px;font-family:"Noto Serif SC",serif;letter-spacing:0.12em;}
-.form-card{background:#fff;border:1px solid var(--gray-bd);border-radius:18px;box-shadow:0 4px 28px rgba(181,40,28,0.07),0 1px 4px rgba(0,0,0,0.04);padding:28px;position:relative;overflow:hidden;}
+.hero-sub{color:var(--gray-lt);font-size:.87rem;margin-bottom:28px;font-family:"Noto Serif TC",serif;letter-spacing:.12em;}
+.form-card{background:#fff;border:1px solid var(--gray-bd);border-radius:18px;box-shadow:0 4px 28px rgba(181,40,28,.07),0 1px 4px rgba(0,0,0,.04);padding:28px;position:relative;overflow:hidden;}
 .form-card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--red3),var(--red),var(--red2));}
-.form-sec{font-size:0.67rem;font-weight:700;letter-spacing:0.18em;color:var(--red);text-transform:uppercase;margin:18px 0 11px;padding-bottom:7px;border-bottom:1.5px solid var(--red-light);display:flex;align-items:center;gap:6px;}
+.form-sec{font-size:.67rem;font-weight:700;letter-spacing:.18em;color:var(--red);text-transform:uppercase;margin:18px 0 11px;padding-bottom:7px;border-bottom:1.5px solid var(--red-light);display:flex;align-items:center;gap:6px;}
 .form-sec:first-of-type{margin-top:0;}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .fg{margin-bottom:12px;}
-.fl{display:block;font-size:0.77rem;font-weight:600;color:var(--gray);margin-bottom:5px;}
-.fi{width:100%;background:#fff;border:1.5px solid var(--gray-bd);border-radius:9px;padding:10px 13px;color:var(--black);font-size:0.91rem;font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;transition:border-color 0.18s,box-shadow 0.18s;outline:none;appearance:none;}
-.fi:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(181,40,28,0.1);}
-.fi:disabled{background:#f5f5f5;opacity:0.55;cursor:not-allowed;}
+.fl{display:block;font-size:.77rem;font-weight:600;color:var(--gray);margin-bottom:5px;}
+.fi{width:100%;background:#fff;border:1.5px solid var(--gray-bd);border-radius:9px;padding:10px 13px;color:var(--black);font-size:.91rem;font-family:"Noto Sans Thai","Noto Sans TC",sans-serif;transition:border-color .18s,box-shadow .18s;outline:none;-webkit-appearance:none;}
+.fi:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(181,40,28,.1);}
+.fi:disabled{background:#f5f5f5;opacity:.55;cursor:not-allowed;}
 .cbrow{display:flex;align-items:center;gap:7px;margin-top:7px;}
 .cbrow input[type=checkbox]{accent-color:var(--red);width:15px;height:15px;cursor:pointer;}
-.cbrow label{font-size:0.81rem;color:var(--gray-lt);cursor:pointer;}
+.cbrow label{font-size:.81rem;color:var(--gray-lt);cursor:pointer;}
 .tag-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px;}
-.tc{padding:4px 13px;border-radius:20px;font-size:0.76rem;font-weight:600;border:1.5px solid var(--gray-bd);background:#fff;color:var(--gray);cursor:pointer;transition:all 0.14s;}
+.tc{padding:4px 13px;border-radius:20px;font-size:.76rem;font-weight:600;border:1.5px solid var(--gray-bd);background:#fff;color:var(--gray);cursor:pointer;transition:all .14s;}
 .tc:hover{border-color:var(--red);color:var(--red);}
 .tc.sel{border-color:var(--red);color:#fff;background:var(--red);}
 .btn-row{display:grid;grid-template-columns:1fr 2.3fr;gap:11px;margin-top:24px;}
-.btn{padding:13px 18px;border-radius:10px;font-size:0.92rem;font-weight:700;cursor:pointer;border:none;font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;transition:all 0.18s;display:flex;align-items:center;justify-content:center;gap:7px;}
+.btn{padding:13px 18px;border-radius:10px;font-size:.92rem;font-weight:700;cursor:pointer;border:none;font-family:"Noto Sans Thai","Noto Sans TC",sans-serif;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:7px;}
 .btn-outline{background:#fff;color:var(--gray);border:1.5px solid var(--gray-bd);}
 .btn-outline:hover{border-color:var(--red);color:var(--red);}
-.btn-red{background:linear-gradient(135deg,var(--red3),var(--red));color:#fff;box-shadow:0 4px 14px rgba(181,40,28,0.28);}
-.btn-red:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(181,40,28,0.36);}
+.btn-red{background:linear-gradient(135deg,var(--red3),var(--red));color:#fff;box-shadow:0 4px 14px rgba(181,40,28,.28);}
+.btn-red:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(181,40,28,.36);}
 .recent-sec{margin-top:22px;}
-.recent-lbl{font-size:0.69rem;font-weight:700;letter-spacing:0.15em;color:var(--red);text-transform:uppercase;margin-bottom:10px;}
+.recent-lbl{font-size:.69rem;font-weight:700;letter-spacing:.15em;color:var(--red);text-transform:uppercase;margin-bottom:10px;}
 .recent-list{display:flex;flex-wrap:wrap;gap:8px;}
-.recent-btn{display:flex;align-items:center;gap:8px;padding:8px 15px;border-radius:10px;border:1.5px solid;background:#fff;cursor:pointer;font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;font-size:0.82rem;color:var(--black);font-weight:600;transition:all 0.15s;}
-.recent-btn-zh{font-family:"Noto Serif SC",serif;font-size:1.1rem;}
-
+.recent-btn{display:flex;align-items:center;gap:8px;padding:8px 15px;border-radius:10px;border:1.5px solid;background:#fff;cursor:pointer;font-family:"Noto Sans Thai","Noto Sans TC",sans-serif;font-size:.82rem;color:var(--black);font-weight:600;transition:all .15s;}
+.recent-btn-zh{font-family:"Noto Serif TC",serif;font-size:1.1rem;}
 /* RESULT */
 #page-result{background:var(--bg);padding:66px 16px 60px;}
 .result-wrap{max-width:900px;margin:0 auto;}
-
-/* RESULT HEADER */
-.result-header{background:#fff;border:1px solid var(--gray-bd);border-radius:18px;padding:24px 28px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,0.05);position:relative;overflow:hidden;}
+.result-header{background:#fff;border:1px solid var(--gray-bd);border-radius:16px;padding:24px 28px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.05);position:relative;overflow:hidden;}
 .result-header::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--red3),var(--red),var(--red2));}
 .result-header-row{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;}
 .result-name{font-family:"Ma Shan Zheng",serif;font-size:1.8rem;color:var(--red);line-height:1.2;margin-bottom:5px;}
-.result-meta{display:flex;flex-wrap:wrap;gap:10px;color:var(--gray);font-size:0.83rem;}
+.result-meta{display:flex;flex-wrap:wrap;gap:10px;color:var(--gray);font-size:.83rem;}
 .mi{display:flex;align-items:center;gap:5px;}
-.rtag{display:inline-block;padding:2px 9px;border-radius:12px;font-size:0.7rem;font-weight:700;background:var(--red-light);color:var(--red3);border:1px solid rgba(181,40,28,0.2);margin-right:4px;}
-.dm-badge{display:inline-flex;align-items:center;gap:9px;background:var(--red);color:#fff;padding:9px 17px;border-radius:11px;font-size:0.84rem;font-weight:700;white-space:nowrap;flex-shrink:0;}
-.dm-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:"Noto Serif SC",serif;font-size:1.25rem;background:rgba(255,255,255,0.22);}
-.cdown{background:var(--red-light);border:1px solid rgba(181,40,28,0.2);border-radius:9px;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;margin-top:14px;font-size:0.81rem;}
+.rtag{display:inline-block;padding:2px 9px;border-radius:12px;font-size:.7rem;font-weight:700;background:var(--red-light);color:var(--red3);border:1px solid rgba(181,40,28,.2);margin-right:4px;}
+.dm-badge{display:inline-flex;align-items:center;gap:9px;background:var(--red);color:#fff;padding:9px 17px;border-radius:11px;font-size:.84rem;font-weight:700;white-space:nowrap;flex-shrink:0;}
+.dm-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:"Noto Serif TC",serif;font-size:1.25rem;background:rgba(255,255,255,.22);}
+.cdown{background:var(--red-light);border:1px solid rgba(181,40,28,.2);border-radius:9px;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;margin-top:14px;font-size:.81rem;}
 .cdown-lbl{color:var(--red3);font-weight:600;}
-.cdown-timer{font-family:"Noto Serif SC","Noto Sans SC",monospace;font-size:1rem;color:var(--red);font-weight:700;letter-spacing:0.04em;}
-
-/* ACTIONS */
+.cdown-timer{font-family:"Noto Serif TC","Noto Sans TC",monospace;font-size:1rem;color:var(--red);font-weight:700;letter-spacing:.04em;}
 .action-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
-.abtn{padding:8px 16px;border-radius:8px;font-size:0.79rem;font-weight:700;cursor:pointer;border:1.5px solid var(--gray-bd);background:#fff;color:var(--gray);font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;transition:all 0.14s;display:flex;align-items:center;gap:6px;}
+.abtn{padding:8px 16px;border-radius:8px;font-size:.79rem;font-weight:700;cursor:pointer;border:1.5px solid var(--gray-bd);background:#fff;color:var(--gray);font-family:"Noto Sans Thai","Noto Sans TC",sans-serif;transition:all .14s;display:flex;align-items:center;gap:6px;}
 .abtn:hover{border-color:var(--red);color:var(--red);background:var(--red-pale);}
 .abtn-back{border-color:var(--red);color:var(--red);background:var(--red-pale);}
 .abtn-back:hover{background:var(--red);color:#fff;}
-
-/* CARDS */
-.scard{background:#fff;border:1px solid var(--gray-bd);border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 1px 6px rgba(0,0,0,0.04);}
-.stitle{font-size:0.69rem;font-weight:700;letter-spacing:0.16em;color:var(--red);text-transform:uppercase;margin-bottom:15px;display:flex;align-items:center;gap:8px;}
-.stitle::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(181,40,28,0.3),transparent);}
-
-/* PILLARS TABLE - like reference image 2 */
-.pillars-table{width:100%;border-radius:14px;overflow:hidden;border:2px solid var(--red);}
-.pillars-header{display:grid;background:var(--red);}
-.ph-cell{padding:10px 6px;text-align:center;color:#fff;font-size:0.78rem;font-weight:700;font-family:"Noto Serif SC","Noto Sans SC",sans-serif;border-right:1px solid rgba(255,255,255,0.2);}
-.ph-cell:last-child{border-right:none;}
-.ph-cell .zh-lbl{font-size:1rem;display:block;margin-bottom:1px;}
-.pillars-body{display:grid;}
-.pb-row{display:grid;border-top:1.5px solid var(--red-light);}
-.pb-cell{padding:14px 8px;text-align:center;border-right:1.5px solid var(--red-light);position:relative;background:#fff;}
-.pb-cell:last-child{border-right:none;}
-.pb-cell.day-col{background:var(--red-pale);}
-.pb-row-label{display:flex;align-items:center;justify-content:center;padding:8px 4px;background:var(--red);writing-mode:vertical-rl;border-top:1.5px solid rgba(255,255,255,0.2);}
-.pb-row-label span{color:#fff;font-family:"Noto Serif SC","Noto Sans SC",sans-serif;font-size:1.1rem;letter-spacing:0.15em;}
-.pb-row-label small{color:rgba(255,255,255,0.7);font-size:0.6rem;display:block;margin-top:3px;font-family:"Noto Sans Thai",sans-serif;}
-.el-circle{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 9px;font-family:"Noto Serif SC",serif;font-size:1.5rem;font-weight:700;}
-.el-zh-big{font-size:1.5rem;font-family:"Noto Serif SC",serif;font-weight:700;display:block;margin-bottom:3px;}
-.el-py{font-size:0.78rem;font-style:italic;color:var(--gray);}
-.el-th{font-size:0.72rem;color:var(--gray-lt);margin-top:2px;}
-
-/* ELEMENT COLORS */
-.c-wood{color:var(--wood)!important;}.c-fire{color:var(--fire)!important;}.c-earth{color:var(--earth)!important;}.c-metal{color:var(--metal)!important;}.c-water{color:var(--water)!important;}
-.bg-wood{background:var(--wood-bg);}.bg-fire{background:var(--fire-bg);}.bg-earth{background:var(--earth-bg);}.bg-metal{background:var(--metal-bg);}.bg-water{background:var(--water-bg);}
-.bdr-wood{border-color:var(--wood)!important;}.bdr-fire{border-color:var(--fire)!important;}.bdr-earth{border-color:var(--earth)!important;}.bdr-metal{border-color:var(--metal)!important;}.bdr-water{border-color:var(--water)!important;}
-
-/* ELEMENT BARS (like image 3) */
-.el-bar{display:flex;align-items:center;gap:16px;padding:14px 18px;cursor:pointer;transition:all 0.15s;}
-.el-bar:hover{filter:brightness(0.95);transform:translateX(2px);}
-.el-bar-icon{flex-shrink:0;}
-.el-bar-name{font-size:1.05rem;font-weight:700;color:#fff;flex:1;}
-.el-bar-pct{font-size:1.05rem;font-weight:700;color:#fff;}
-
-/* ELEMENT ICONS SVG */
-.el-svg{font-family:"Noto Serif SC",serif;font-size:1.2rem;}
-
-/* ANALYSIS GRID */
-.ag{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.ai{background:var(--bg);border:1px solid var(--gray-bd);border-radius:11px;padding:13px;}
-.ai-t{font-size:0.69rem;font-weight:700;letter-spacing:0.1em;color:var(--red);text-transform:uppercase;margin-bottom:7px;}
-.ai-x{font-size:0.83rem;color:var(--gray);line-height:1.7;}
-
-/* ACCORDION */
-.acc{background:#fff;border:1.5px solid var(--gray-bd);border-radius:13px;overflow:hidden;margin-bottom:11px;}
-.acc-h{padding:13px 17px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:background 0.12s;}
+.scard{background:#fff;border:1px solid var(--gray-bd);border-radius:14px;padding:20px;margin-bottom:14px;box-shadow:0 1px 6px rgba(0,0,0,.04);}
+.stitle{font-size:.69rem;font-weight:700;letter-spacing:.16em;color:var(--red);text-transform:uppercase;margin-bottom:15px;display:flex;align-items:center;gap:8px;}
+.stitle::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(181,40,28,.3),transparent);}
+.ag{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.ai{background:var(--bg);border:1px solid var(--gray-bd);border-radius:10px;padding:13px;}
+.ai-t{font-size:.69rem;font-weight:700;letter-spacing:.1em;color:var(--red);text-transform:uppercase;margin-bottom:7px;}
+.ai-x{font-size:.83rem;color:var(--gray);line-height:1.7;}
+.acc{background:#fff;border:1.5px solid var(--gray-bd);border-radius:12px;overflow:hidden;margin-bottom:11px;}
+.acc-h{padding:13px 17px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:background .12s;}
 .acc-h:hover{background:var(--red-pale);}
-.acc-t{font-size:0.87rem;font-weight:700;display:flex;align-items:center;gap:9px;color:var(--black);}
-.acc-c{color:var(--red);font-size:1rem;transition:transform 0.2s;display:inline-block;}
+.acc-t{font-size:.87rem;font-weight:700;display:flex;align-items:center;gap:9px;color:var(--black);}
+.acc-c{color:var(--red);font-size:1rem;transition:transform .2s;display:inline-block;}
 .acc-c.open{transform:rotate(180deg);}
 .acc-b{display:none;padding:0 17px 17px;border-top:1px solid var(--gray-bd);}
 .acc-b.open{display:block;}
-
-/* RADAR */
-#radarChart{min-height:280px;}
-
-/* PERCENT BARS */
 .pbar-row{display:flex;align-items:center;gap:11px;margin-bottom:8px;}
-.pbar-lbl{font-size:0.77rem;font-weight:600;width:50px;text-align:right;}
+.pbar-lbl{font-size:.77rem;font-weight:600;width:50px;text-align:right;}
 .pbar-track{flex:1;height:9px;background:#f0ece8;border-radius:99px;overflow:hidden;}
-.pbar-fill{height:100%;border-radius:99px;transition:width 0.9s cubic-bezier(.4,0,.2,1);}
-.pbar-pct{font-size:0.74rem;color:var(--gray-lt);width:34px;}
-
-/* COLOR CHIPS */
+.pbar-fill{height:100%;border-radius:99px;transition:width .9s cubic-bezier(.4,0,.2,1);}
+.pbar-pct{font-size:.74rem;color:var(--gray-lt);width:34px;}
 .cchips{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px;}
-.cchip{display:flex;align-items:center;gap:6px;padding:4px 11px;border-radius:16px;border:1px solid var(--gray-bd);font-size:0.77rem;background:#fff;color:var(--gray);}
-.cdot{width:10px;height:10px;border-radius:50%;border:1px solid rgba(0,0,0,0.1);}
-
+.cchip{display:flex;align-items:center;gap:6px;padding:4px 11px;border-radius:16px;border:1px solid var(--gray-bd);font-size:.77rem;background:#fff;color:var(--gray);}
+.cdot{width:10px;height:10px;border-radius:50%;border:1px solid rgba(0,0,0,.1);}
+.el-bar{display:flex;align-items:center;gap:16px;padding:14px 18px;cursor:pointer;transition:all .15s;}
+.el-bar:hover{filter:brightness(.95);transform:translateX(2px);}
+.el-bar-icon{flex-shrink:0;}
+.el-bar-name{font-size:1.05rem;font-weight:700;color:#fff;flex:1;}
+.el-bar-pct{font-size:1.05rem;font-weight:700;color:#fff;}
 /* HISTORY */
 #page-history{background:var(--bg);padding:66px 16px 60px;}
 #page-history.active{display:block;}
 .hist-wrap{max-width:980px;margin:0 auto;}
 .hist-title{font-family:"Ma Shan Zheng",serif;font-size:1.7rem;color:var(--red);margin-bottom:18px;display:flex;align-items:center;gap:10px;}
-.search-bar{background:#fff;border:1.5px solid var(--gray-bd);border-radius:9px;padding:9px 15px;color:var(--black);font-size:0.89rem;font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;width:100%;max-width:270px;outline:none;transition:border-color 0.18s;}
+.search-bar{background:#fff;border:1.5px solid var(--gray-bd);border-radius:9px;padding:9px 15px;color:var(--black);font-size:.89rem;font-family:"Noto Sans Thai","Noto Sans TC",sans-serif;width:100%;max-width:270px;outline:none;transition:border-color .18s;}
 .search-bar:focus{border-color:var(--red);}
-.htw{background:#fff;border-radius:14px;overflow:hidden;border:1px solid var(--gray-bd);box-shadow:0 2px 10px rgba(0,0,0,0.05);}
+.htw{background:#fff;border-radius:14px;overflow:hidden;border:1px solid var(--gray-bd);box-shadow:0 2px 10px rgba(0,0,0,.05);}
 .ht{width:100%;border-collapse:collapse;}
-.ht th{background:var(--red);color:#fff;padding:11px 14px;font-size:0.76rem;font-weight:700;text-align:left;letter-spacing:0.06em;}
-.ht td{padding:11px 14px;border-bottom:1px solid #f0ece8;color:var(--black);font-size:0.85rem;vertical-align:middle;}
+.ht th{background:var(--red);color:#fff;padding:11px 14px;font-size:.76rem;font-weight:700;text-align:left;letter-spacing:.06em;}
+.ht td{padding:11px 14px;border-bottom:1px solid #f0ece8;color:var(--black);font-size:.85rem;vertical-align:middle;}
 .ht tr:hover td{background:#fdf6f5;}
 .ht tr:last-child td{border-bottom:none;}
 .hn{font-weight:700;color:var(--black);}
-.he{font-size:0.69rem;font-weight:700;margin-top:3px;}
-.hbtn{padding:5px 11px;border-radius:7px;font-size:0.72rem;font-weight:700;cursor:pointer;border:1.5px solid;margin-right:4px;font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;transition:all 0.14s;}
+.he{font-size:.69rem;font-weight:700;margin-top:3px;}
+.hbtn{padding:5px 11px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;border:1.5px solid;margin-right:4px;font-family:"Noto Sans Thai","Noto Sans TC",sans-serif;transition:all .14s;}
 .hbv{border-color:var(--red);color:var(--red);background:var(--red-pale);}
 .hbv:hover{background:var(--red);color:#fff;}
 .hbd{border-color:#ddd;color:#999;background:#f9f9f9;}
 .hbd:hover{border-color:#e74c3c;color:#e74c3c;background:#fdf2f2;}
 .pagination{display:flex;gap:5px;}
-.pgbtn{padding:6px 11px;border-radius:7px;font-size:0.78rem;cursor:pointer;border:1.5px solid var(--gray-bd);background:#fff;color:var(--gray);transition:all 0.13s;}
+.pgbtn{padding:6px 11px;border-radius:7px;font-size:.78rem;cursor:pointer;border:1.5px solid var(--gray-bd);background:#fff;color:var(--gray);transition:all .13s;}
 .pgbtn.active{border-color:var(--red);color:var(--red);background:var(--red-pale);font-weight:700;}
 .pgbtn:hover:not(.active){border-color:var(--red);color:var(--red);}
-
-/* QR MODAL */
-.modal-ov{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+/* MODALS */
+.modal-ov{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
 .modal-ov.open{display:flex;}
-.modal-box{background:#fff;border-radius:18px;overflow:hidden;width:420px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,0.2);}
+.modal-box{background:#fff;border-radius:18px;overflow:hidden;width:420px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.2);}
 .modal-hdr{background:var(--red);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;}
-.modal-tit{font-size:0.88rem;font-weight:700;color:#fff;}
-.modal-cls{background:none;border:none;color:rgba(255,255,255,0.8);cursor:pointer;font-size:1.2rem;line-height:1;}
+.modal-tit{font-size:.88rem;font-weight:700;color:#fff;}
+.modal-cls{background:none;border:none;color:rgba(255,255,255,.8);cursor:pointer;font-size:1.2rem;line-height:1;}
 .modal-cls:hover{color:#fff;}
 .modal-bdy{padding:22px;background:#fff;}
 .slip-cw{display:flex;justify-content:center;margin-bottom:14px;}
 .modal-ftr{padding:14px 22px;border-top:1px solid var(--gray-bd);display:flex;gap:9px;justify-content:flex-end;}
-.bsm{padding:9px 17px;border-radius:8px;font-size:0.81rem;font-weight:700;cursor:pointer;font-family:"Noto Sans Thai","Noto Sans SC",sans-serif;transition:all 0.15s;border:none;}
+.bsm{padding:9px 17px;border-radius:8px;font-size:.81rem;font-weight:700;cursor:pointer;font-family:"Noto Sans Thai","Noto Sans TC",sans-serif;transition:all .15s;border:none;}
 .bsm-out{background:#fff;color:var(--gray);border:1.5px solid var(--gray-bd);}
 .bsm-out:hover{border-color:var(--red);color:var(--red);}
-.bsm-red{background:var(--red);color:#fff;box-shadow:0 3px 10px rgba(181,40,28,0.25);}
+.bsm-red{background:var(--red);color:#fff;box-shadow:0 3px 10px rgba(181,40,28,.25);}
 .bsm-red:hover{background:var(--red3);}
-
+.c-wood{color:var(--wood)!important;}.c-fire{color:var(--fire)!important;}.c-earth{color:var(--earth)!important;}.c-metal{color:var(--metal)!important;}.c-water{color:var(--water)!important;}
 /* ANIMATIONS */
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
-.fu{animation:fadeUp 0.38s ease forwards;}
-.fu1{animation-delay:0.05s;opacity:0;}.fu2{animation-delay:0.1s;opacity:0;}.fu3{animation-delay:0.16s;opacity:0;}
+.fu{animation:fadeUp .38s ease forwards;}
+.fu1{animation-delay:.05s;opacity:0;}.fu2{animation-delay:.1s;opacity:0;}.fu3{animation-delay:.16s;opacity:0;}
 @keyframes spin{to{transform:rotate(360deg);}}
 @keyframes spin360{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
-.spin{animation:spin 0.6s linear;}
-
+.spin{animation:spin .6s linear;}
 /* PRINT */
 @media print{
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
@@ -246,13 +191,13 @@ body::before{content:"";position:fixed;inset:0;background-image:radial-gradient(
     <div class="nav-links">
       <button class="nav-btn" id="nav-home" onclick="goPage('home')">ดูดวง</button>
       <button class="nav-btn" id="nav-history" onclick="goPage('history')">ประวัติ</button>
-      <button class="nav-btn" onclick="openSettings()" title="ตั้งค่า GAS URL" style="padding:6px 12px;font-size:1rem" id="nav-settings">⚙</button>
+      <button class="nav-btn" onclick="openSettings()" style="padding:6px 12px;font-size:1rem" id="nav-settings">⚙</button>
       <button class="nav-refresh" onclick="refreshPage()" title="รีเฟรช">↺</button>
     </div>
   </div>
 </nav>
 
-<!-- HOME -->
+<!-- HOME PAGE -->
 <div id="page-home" class="page">
   <div class="home-wrap">
     <div class="hero-badge">🏮 ระบบดูดวงปาจื้อ</div>
@@ -263,12 +208,21 @@ body::before{content:"";position:fixed;inset:0;background-image:radial-gradient(
       <div class="fg"><label class="fl">ชื่อ - นามสกุล *</label><input type="text" id="inp-name" class="fi" placeholder="กรอกชื่อ-นามสกุล"/></div>
       <div class="form-row">
         <div class="fg"><label class="fl">เพศ</label><select id="inp-gender" class="fi"><option value="male">♂ ชาย</option><option value="female">♀ หญิง</option></select></div>
-        <div class="fg"><label class="fl">Tag</label><div class="tag-chips"><div class="tc" onclick="toggleTag(this)">VIP</div><div class="tc" onclick="toggleTag(this)">เรื่องงาน</div><div class="tc" onclick="toggleTag(this)">เรื่องรัก</div><div class="tc" onclick="toggleTag(this)">เรื่องเงิน</div><div class="tc" onclick="toggleTag(this)">สุขภาพ</div></div></div>
+        <div class="fg"><label class="fl">Tag</label><div class="tag-chips">
+          <div class="tc" onclick="toggleTag(this)">VIP</div>
+          <div class="tc" onclick="toggleTag(this)">เรื่องงาน</div>
+          <div class="tc" onclick="toggleTag(this)">เรื่องรัก</div>
+          <div class="tc" onclick="toggleTag(this)">เรื่องเงิน</div>
+          <div class="tc" onclick="toggleTag(this)">สุขภาพ</div>
+        </div></div>
       </div>
       <div class="form-sec">📅 วันเวลาเกิด</div>
       <div class="form-row">
         <div class="fg"><label class="fl">วันเกิด *</label><input type="date" id="inp-date" class="fi"/></div>
-        <div class="fg"><label class="fl">เวลาเกิด</label><input type="time" id="inp-time" class="fi" value="12:00"/><div class="cbrow"><input type="checkbox" id="no-time" onchange="toggleTime(this)"/><label for="no-time">ไม่ทราบเวลาเกิด</label></div></div>
+        <div class="fg"><label class="fl">เวลาเกิด</label>
+          <input type="time" id="inp-time" class="fi" value="12:00"/>
+          <div class="cbrow"><input type="checkbox" id="no-time" onchange="toggleTime(this)"/><label for="no-time">ไม่ทราบเวลาเกิด</label></div>
+        </div>
       </div>
       <div class="btn-row">
         <button class="btn btn-outline" onclick="clearForm()">↺ ล้างข้อมูล</button>
@@ -282,7 +236,7 @@ body::before{content:"";position:fixed;inset:0;background-image:radial-gradient(
   </div>
 </div>
 
-<!-- RESULT -->
+<!-- RESULT PAGE -->
 <div id="page-result" class="page">
   <div class="result-wrap" id="result-wrap">
     <div style="display:flex;align-items:center;justify-content:center;height:300px;">
@@ -294,22 +248,20 @@ body::before{content:"";position:fixed;inset:0;background-image:radial-gradient(
   </div>
 </div>
 
-<!-- HISTORY -->
+<!-- HISTORY PAGE -->
 <div id="page-history" class="page">
   <div class="hist-wrap">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:11px;">
       <h2 class="hist-title">🏮 ประวัติการดูดวง</h2>
       <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
-        <input class="search-bar" id="hist-search" placeholder="🔍 ค้นหาชื่อ..." oninput="renderHistoryTable()"/>
-        <button onclick="_historyCache=null;renderHistory()" title="ดึงข้อมูลใหม่จาก GAS"
-          style="padding:9px 14px;border-radius:9px;border:1.5px solid var(--red);background:var(--red-pale);color:var(--red);font-size:0.82rem;font-weight:700;cursor:pointer;font-family:'Noto Sans Thai',sans-serif;white-space:nowrap;transition:all 0.15s"
+        <input class="search-bar" id="hist-search" placeholder="🔍 ค้นหาชื่อ..." oninput="filterHistory()"/>
+        <button onclick="loadHistory()" title="โหลดใหม่จาก GAS"
+          style="padding:9px 14px;border-radius:9px;border:1.5px solid var(--red);background:var(--red-pale);color:var(--red);font-size:.82rem;font-weight:700;cursor:pointer;font-family:'Noto Sans Thai',sans-serif;white-space:nowrap;transition:all .15s"
           onmouseover="this.style.background='var(--red)';this.style.color='#fff'"
-          onmouseout="this.style.background='var(--red-pale)';this.style.color='var(--red)'">
-          ↺ ซิงค์ GAS
-        </button>
+          onmouseout="this.style.background='var(--red-pale)';this.style.color='var(--red)'">↺ โหลดใหม่</button>
       </div>
     </div>
-    <div id="hist-sync-status" style="font-size:0.78rem;margin-bottom:12px;min-height:20px"></div>
+    <div id="hist-sync-status" style="font-size:.78rem;margin-bottom:12px;min-height:20px"></div>
     <div class="htw">
       <table class="ht">
         <thead><tr><th style="width:38px">#</th><th>วันที่ดูดวง</th><th>ชื่อ - นามสกุล</th><th>Tag</th><th style="width:120px">จัดการ</th></tr></thead>
@@ -317,7 +269,7 @@ body::before{content:"";position:fixed;inset:0;background-image:radial-gradient(
       </table>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:11px;flex-wrap:wrap;gap:9px;">
-      <div id="hist-count" style="font-size:0.78rem;color:var(--gray-lt)"></div>
+      <div id="hist-count" style="font-size:.78rem;color:var(--gray-lt)"></div>
       <div id="pagination-wrap"></div>
     </div>
   </div>
@@ -329,6 +281,59 @@ body::before{content:"";position:fixed;inset:0;background-image:radial-gradient(
     <div class="modal-hdr"><span class="modal-tit">🔖 สลิปใบดูดวง (58mm)</span><button class="modal-cls" onclick="closeQr()">✕</button></div>
     <div class="modal-bdy"><div class="slip-cw"><canvas id="slip-canvas"></canvas></div></div>
     <div class="modal-ftr"><button class="bsm bsm-out" onclick="closeQr()">ปิด</button><button class="bsm bsm-red" onclick="downloadSlip()">⬇ ดาวน์โหลด PNG</button></div>
+  </div>
+</div>
+
+<!-- SHARE CARD MODAL -->
+<div class="modal-ov" id="share-card-modal">
+  <div class="modal-box" style="width:420px;max-width:96vw">
+    <div class="modal-hdr">
+      <span class="modal-tit">📤 แชร์การ์ดดวงปาจื้อ</span>
+      <button class="modal-cls" onclick="closeShareCard()">✕</button>
+    </div>
+    <div class="modal-bdy" style="padding:16px">
+      <div id="share-card-preview" style="display:flex;justify-content:center;margin-bottom:14px">
+        <canvas id="share-canvas" style="border-radius:16px;max-width:100%;box-shadow:0 4px 20px rgba(0,0,0,0.15)"></canvas>
+      </div>
+      <p style="font-size:0.77rem;color:#999;text-align:center;margin-bottom:12px">กดบันทึกรูป แล้วแชร์ผ่าน LINE, Facebook หรือ Social Media</p>
+    </div>
+    <div class="modal-ftr">
+      <button class="bsm bsm-out" onclick="closeShareCard()">ปิด</button>
+      <button class="bsm bsm-red" onclick="downloadShareCard()">📥 บันทึกรูป</button>
+      <button class="bsm" style="background:#25D366;color:#fff;border:none" onclick="shareCardNative()">📤 แชร์</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-ov" id="settings-modal">
+  <div class="modal-box" style="width:480px">
+    <div class="modal-hdr">
+      <span class="modal-tit">⚙ ตั้งค่าระบบ GAS URL</span>
+      <button class="modal-cls" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="modal-bdy" style="padding:24px">
+      <div style="font-size:0.82rem;color:#555;margin-bottom:16px;line-height:1.7;background:#fef9f5;border:1px solid #f0e0c0;border-radius:10px;padding:14px">
+        <b style="color:#B5281C">วิธีตั้งค่า:</b><br>
+        1. เปิด Google Apps Script → Deploy → Web App<br>
+        2. ตั้งค่า <b>Execute as: Me</b> และ <b>Access: Anyone</b><br>
+        3. คัดลอก URL ที่ได้มาวางด้านล่าง<br>
+        4. กด "บันทึก" เพื่อเริ่มใช้งาน
+      </div>
+      <label style="font-size:0.78rem;font-weight:700;color:#B5281C;letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:7px">Google Apps Script URL</label>
+      <input type="url" id="gas-url-input" placeholder="https://script.google.com/macros/s/.../exec"
+        style="width:100%;padding:11px 14px;border:1.5px solid #ddd;border-radius:9px;font-size:0.88rem;font-family:'Noto Sans Thai',sans-serif;outline:none;transition:border-color 0.2s"
+        onfocus="this.style.borderColor='#B5281C'" onblur="this.style.borderColor='#ddd'"/>
+      <div id="gas-status" style="margin-top:10px;font-size:0.8rem;min-height:20px"></div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button onclick="testGasUrl()" class="bsm bsm-out" style="flex:1">🔍 ทดสอบการเชื่อมต่อ</button>
+        <button onclick="saveGasUrl()" class="bsm bsm-red" style="flex:1">💾 บันทึก URL</button>
+      </div>
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid #f0e8e8">
+        <div style="font-size:0.75rem;font-weight:700;color:#888;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px">สถานะปัจจุบัน</div>
+        <div id="current-gas-status" style="font-size:0.83rem;color:#555"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -515,26 +520,147 @@ const DM_COLORS={
 };
 
 /* ── APP STATE ──────────────────────────────────── */
-let currentResult=null, radarChart=null, countdownInt=null, histPage=1;
-const PER_PAGE=20;
-// GAS URL stored in localStorage so admin can configure via UI
-function getGasUrl(){return localStorage.getItem("soulElementGasUrl")||"https://script.google.com/macros/s/AKfycbyFujaCpOl3nh7a4tbVcHPn0dO7mzoYvmKtLDlk5s5qghpuIWMKU5l2jxIdQlWnD2Y/exec";}
-function setGasUrl(u){localStorage.setItem("soulElementGasUrl",u.trim());}
-function hasGas(){const u=getGasUrl();return u&&u.startsWith("https://");}
+let currentResult  = null;
+let radarChart     = null;
+let countdownInt   = null;
+let histPage       = 1;
+const PER_PAGE     = 20;
+const GAS_URL      = "https://script.google.com/macros/s/AKfycbyFujaCpOl3nh7a4tbVcHPn0dO7mzoYvmKtLDlk5s5qghpuIWMKU5l2jxIdQlWnD2Y/exec";
+const IS_SHARED_VIEW = !!new URLSearchParams(window.location.search).get("id");
 
-/* ── PAGE ROUTING ───────────────────────────────── */
-function goPage(n){
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
-  document.getElementById("page-"+n).classList.add("active");
-  const nb=document.getElementById("nav-"+n);if(nb)nb.classList.add("active");
-  window.scrollTo(0,0);
-  if(n==="history"){_historyCache=null;renderHistory();}
-  if(n==="home")renderRecent();
+/* ── GAS API ─────────────────────────────────────── */
+// GAS เป็น single source of truth — ดึงตรงทุกครั้ง
+// JSONP loader — bypasses CORS completely (works with any GAS Web App)
+function gasJsonp(params = {}, timeoutMs = 15000) {
+  return new Promise((resolve, reject) => {
+    const gasUrl = localStorage.getItem("soulElementGasUrl") || GAS_URL;
+    const cbName = "_gasCallback_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+    const url    = new URL(gasUrl);
+    Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+    url.searchParams.set("callback", cbName);
+    url.searchParams.set("t", Date.now());
+
+    const timer = setTimeout(() => {
+      cleanup();
+      reject(new Error("GAS JSONP timeout"));
+    }, timeoutMs);
+
+    function cleanup() {
+      clearTimeout(timer);
+      delete window[cbName];
+      const el = document.getElementById(cbName);
+      if (el) el.remove();
+    }
+
+    window[cbName] = function(data) {
+      cleanup();
+      resolve(data);
+    };
+
+    const script = document.createElement("script");
+    script.id  = cbName;
+    script.src = url.toString();
+    script.onerror = function() {
+      cleanup();
+      reject(new Error("GAS script load error"));
+    };
+    document.head.appendChild(script);
+  });
 }
-function refreshPage(){
-  const r=document.querySelector(".nav-refresh");
-  if(r){r.classList.add("spin");setTimeout(()=>r.classList.remove("spin"),600);}
+
+// Regular fetch fallback (works if GAS has CORS configured)
+async function gasFetch(params = {}) {
+  const gasUrl = localStorage.getItem("soulElementGasUrl") || GAS_URL;
+  const url    = new URL(gasUrl);
+  Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+  url.searchParams.set("t", Date.now());
+  const res  = await fetch(url.toString(), { method: "GET", redirect: "follow" });
+  if (!res.ok) throw new Error("GAS fetch failed: " + res.status);
+  const text = await res.text();
+  if (!text || text === "null") return null;
+  return JSON.parse(text);
+}
+
+// gasGet: try JSONP first (bypasses CORS), fallback to fetch
+async function gasGet(params = {}) {
+  try {
+    const data = await gasJsonp(params);
+    return data;
+  } catch(e1) {
+    console.warn("gasGet JSONP failed:", e1.message, "— trying fetch...");
+    try {
+      return await gasFetch(params);
+    } catch(e2) {
+      throw new Error("gasGet failed: " + e2.message);
+    }
+  }
+}
+
+async function gasPost(body) {
+  const gasUrl = localStorage.getItem("soulElementGasUrl") || GAS_URL;
+  try {
+    await fetch(gasUrl, {
+      method : "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body   : JSON.stringify(body),
+    });
+  } catch(e) {
+    // text/plain avoids CORS preflight but GAS might still fail silently
+    // try sendBeacon as fallback (fire-and-forget)
+    try { navigator.sendBeacon(gasUrl, JSON.stringify(body)); } catch(e2) {}
+  }
+}
+
+// ── Public helpers ──────────────────────────────────
+async function saveToGAS(r)   { try { await gasPost({ action: "saveResult",   data: r }); } catch(e) { console.warn("saveToGAS:", e.message); } }
+async function deleteFromGAS(id) { try { await gasPost({ action: "deleteResult", id       }); } catch(e) { console.warn("deleteFromGAS:", e.message); } }
+
+async function getResultFromGAS(id) {
+  try {
+    const data = await gasGet({ action: "getResult", id });
+    return (data && data.id && data.bazi) ? data : null;
+  } catch(e) { console.warn("getResultFromGAS:", e.message); return null; }
+}
+
+async function getHistoryFromGAS() {
+  try {
+    const data = await gasGet({ action: "getHistory" });
+    return Array.isArray(data) ? data : [];
+  } catch(e) { console.warn("getHistoryFromGAS:", e.message); return []; }
+}
+
+/* ── LOCAL STORAGE (cache only — GAS is source of truth) ── */
+// ใช้เป็น cache เฉพาะสำหรับ "เพิ่งดูดวง" (currentResult)
+// ไม่ใช้สำหรับ History — History ดึงจาก GAS ตรงๆ เสมอ
+function saveLocal(r) {
+  try {
+    let h = getLocal().filter(x => x.id !== r.id);
+    h.unshift(r);
+    if (h.length > 50) h = h.slice(0, 50); // แค่ cache ชั่วคราว
+    localStorage.setItem("baziCache", JSON.stringify(h));
+  } catch(e) {}
+}
+function getLocal() {
+  try { return JSON.parse(localStorage.getItem("baziCache") || "[]"); } catch(e) { return []; }
+}
+function delLocal(id) {
+  try { localStorage.setItem("baziCache", JSON.stringify(getLocal().filter(r => r.id !== id))); } catch(e) {}
+}
+
+/* ── PAGE ROUTING ─────────────────────────────────── */
+function goPage(n) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById("page-" + n).classList.add("active");
+  const nb = document.getElementById("nav-" + n);
+  if (nb) nb.classList.add("active");
+  window.scrollTo(0, 0);
+  if (n === "history") loadHistory();
+  if (n === "home")    loadRecent();
+}
+function refreshPage() {
+  const r = document.querySelector(".nav-refresh");
+  if (r) { r.classList.add("spin"); setTimeout(() => r.classList.remove("spin"), 600); }
   location.reload();
 }
 
@@ -607,36 +733,7 @@ function calcElements(bazi,hasTime){
 function elThaiName(el){return{wood:"ธาตุไม้",fire:"ธาตุไฟ",earth:"ธาตุดิน",metal:"ธาตุทอง",water:"ธาตุน้ำ"}[el]||el;}
 
 /* ── CALCULATE ──────────────────────────────────── */
-function calculate(){
-  const name=document.getElementById("inp-name").value.trim();
-  const dateVal=document.getElementById("inp-date").value;
-  const timeVal=document.getElementById("inp-time").value;
-  const noTime=document.getElementById("no-time").checked;
-  const gender=document.getElementById("inp-gender").value;
-  const tags=[...document.querySelectorAll(".tc.sel")].map(c=>c.textContent.trim());
-  if(!name)return toast2("error","กรุณากรอกชื่อ-นามสกุล");
-  if(!dateVal)return toast2("error","กรุณาเลือกวันเกิด");
-  const[year,month,day]=dateVal.split("-").map(Number);
-  let hour=12;
-  if(!noTime&&timeVal)hour=parseInt(timeVal.split(":")[0],10);
-  Swal.fire({
-    title:"<span style=\"font-family:'Ma Shan Zheng',serif;color:#B5281C\">กำลังคำนวณดวง...</span>",
-    html:"<div style=\"color:#888;font-size:0.84rem\">ประมวลผลสี่เสาหลัก 四柱命理</div>",
-    allowOutsideClick:false,showConfirmButton:false,background:"#fff",
-    customClass:{popup:"swal-cn"},didOpen:()=>Swal.showLoading()
-  });
-  setTimeout(()=>{
-    const bazi=calcBazi(year,month,day,hour,!noTime);
-    const{pct}=calcElements(bazi,!noTime);
-    const createdAt=Date.now();          // integer ms
-    const expireAt=createdAt+(7*24*60*60*1000); // exactly 7 days later
-    const id="be-"+createdAt;
-    const result={id,name,dateVal,timeVal:noTime?null:timeVal,gender,tags,bazi,pct,createdAt,expireAt,noTime};
-    currentResult=result;
-    saveLocal(result);updateCacheWithRecord(result);saveGAS(result).catch(()=>{});
-    Swal.close();renderResult(result);goPage("result");
-  },700);
-}
+
 
 function buildActionRow(rid){
   return `<div class="action-row no-print fu fu1">
@@ -678,6 +775,18 @@ function renderResult(r){
   <div class="result-header-row">
     <div>
       <div class="result-name">${esc(r.name)}</div>
+      <div style="margin-bottom:8px">
+        ${(()=>{
+          const boost=sorted.find(e=>e.pct<20)||sorted[sorted.length-1];
+          const elC=EL_COLOR[boost.el];
+          const elB=EL_BG[boost.el];
+          return `<span style="display:inline-flex;align-items:center;gap:7px;background:${elB};border:1.5px solid ${elC}40;border-radius:20px;padding:5px 14px;">
+            <span style="font-family:'Noto Serif TC','Noto Sans TC',serif;font-size:1rem;color:${elC};font-weight:700">${EL_ICON_CH[boost.el]}</span>
+            <span style="font-size:0.78rem;color:#555;font-weight:500">ธาตุที่ควรเสริม</span>
+            <span style="font-size:0.82rem;font-weight:700;color:${elC}">ธาตุ${EL_THAI[boost.el]} (${boost.pct}%)</span>
+          </span>`;
+        })()}
+      </div>
       <div class="result-meta">
         <span class="mi">📅 ${dStr}</span>
         ${!r.noTime?`<span class="mi">🕐 ${r.timeVal} น.</span>`:""}
@@ -686,7 +795,7 @@ function renderResult(r){
       ${r.tags&&r.tags.length?`<div style="margin-top:7px">${r.tags.map(t=>`<span class="rtag">${esc(t)}</span>`).join("")}</div>`:""}
     </div>
     <div class="dm-badge">
-      <div class="dm-icon" style="font-family:'Noto Serif SC',serif">${dm.zh}</div>
+      <div class="dm-icon" style="font-family:'Noto Serif TC',serif">${dm.zh}</div>
       <div><div style="font-size:0.69rem;opacity:0.8">Day Master</div><div>${dm.thaiEl}</div></div>
     </div>
   </div>
@@ -709,10 +818,10 @@ ${IS_SHARED_VIEW?"":buildActionRow(r.id)}
       <tr style="background:#B5281C">
         ${pillarCols.map(p=>`
         <th style="padding:10px 6px;text-align:center;color:#fff;border-right:1px solid rgba(255,255,255,0.2);${p.isDay?"background:#922B21;":""}"
-        ><span style="font-family:'Noto Serif SC',serif;font-size:1.1rem;display:block">${p.zh}</span>
+        ><span style="font-family:'Noto Serif TC',serif;font-size:1.1rem;display:block">${p.zh}</span>
         <span style="font-size:0.72rem;opacity:0.85;font-family:'Noto Sans Thai',sans-serif">${p.th}</span></th>`).join("")}
         <th rowspan="2" style="padding:6px 4px;text-align:center;color:#fff;width:34px;background:#7B1A12;vertical-align:top">
-          <div style="writing-mode:vertical-rl;font-family:'Noto Serif SC',serif;font-size:1rem;letter-spacing:0.2em;margin-bottom:4px">天干</div>
+          <div style="writing-mode:vertical-rl;font-family:'Noto Serif TC',serif;font-size:1rem;letter-spacing:0.2em;margin-bottom:4px">天干</div>
           <div style="writing-mode:vertical-rl;font-size:0.6rem;opacity:0.7;font-family:'Noto Sans Thai',sans-serif">ฟ้า</div>
         </th>
       </tr>
@@ -723,9 +832,9 @@ ${IS_SHARED_VIEW?"":buildActionRow(r.id)}
         ${pillarCols.map(p=>`
         <td style="padding:16px 10px;text-align:center;border-right:1px solid #f0e8e8;border-top:1px solid #e8d8d8;background:${p.isDay?"#FEF0EE":"#fff"};vertical-align:middle">
           <div style="width:50px;height:50px;border-radius:50%;background:${EL_COLOR[p.stem.el]}18;border:2px solid ${EL_COLOR[p.stem.el]}60;margin:0 auto 10px;display:flex;align-items:center;justify-content:center">
-            <span style="font-family:'Noto Serif SC',serif;font-size:1.5rem;font-weight:700;color:${EL_COLOR[p.stem.el]}">${p.stem.zh}</span>
+            <span style="font-family:'Noto Serif TC',serif;font-size:1.5rem;font-weight:700;color:${EL_COLOR[p.stem.el]}">${p.stem.zh}</span>
           </div>
-          <div style="font-family:'Noto Serif SC',serif;font-size:1.1rem;font-weight:700;color:${EL_COLOR[p.stem.el]};margin-bottom:3px">${p.stem.zh} <span style="font-size:0.85rem;font-style:italic;color:#888">${p.stem.py}</span></div>
+          <div style="font-family:'Noto Serif TC',serif;font-size:1.1rem;font-weight:700;color:${EL_COLOR[p.stem.el]};margin-bottom:3px">${p.stem.zh} <span style="font-size:0.85rem;font-style:italic;color:#888">${p.stem.py}</span></div>
           <div style="font-size:0.74rem;color:#777">${p.stem.thaiEl}</div>
         </td>`).join("")}
       </tr>
@@ -734,13 +843,13 @@ ${IS_SHARED_VIEW?"":buildActionRow(r.id)}
         ${pillarCols.map(p=>`
         <td style="padding:16px 10px;text-align:center;border-right:1px solid #f0e8e8;background:${p.isDay?"#FEF0EE":"#fff"};vertical-align:middle;position:relative">
           <div style="width:50px;height:50px;border-radius:12px;background:${EL_COLOR[p.branch.el]}15;border:2px solid ${EL_COLOR[p.branch.el]}50;margin:0 auto 10px;display:flex;align-items:center;justify-content:center">
-            <span style="font-family:'Noto Serif SC',serif;font-size:1.5rem;font-weight:700;color:${EL_COLOR[p.branch.el]}">${p.branch.zh}</span>
+            <span style="font-family:'Noto Serif TC',serif;font-size:1.5rem;font-weight:700;color:${EL_COLOR[p.branch.el]}">${p.branch.zh}</span>
           </div>
-          <div style="font-family:'Noto Serif SC',serif;font-size:1.1rem;font-weight:700;color:${EL_COLOR[p.branch.el]};margin-bottom:3px">${p.branch.zh} <span style="font-size:0.85rem;font-style:italic;color:#888">${p.branch.py}</span></div>
+          <div style="font-family:'Noto Serif TC',serif;font-size:1.1rem;font-weight:700;color:${EL_COLOR[p.branch.el]};margin-bottom:3px">${p.branch.zh} <span style="font-size:0.85rem;font-style:italic;color:#888">${p.branch.py}</span></div>
           <div style="font-size:0.74rem;color:#777">${elThaiName(p.branch.el)}${p.branch.pol==="yang"?"หยาง":"หยิน"}·${p.branch.animal}</div>
         </td>`).join("")}
         <td style="padding:6px 4px;text-align:center;background:#7B1A12;vertical-align:middle">
-          <div style="writing-mode:vertical-rl;font-family:'Noto Serif SC',serif;font-size:1rem;letter-spacing:0.2em;color:#fff;margin-bottom:4px">地支</div>
+          <div style="writing-mode:vertical-rl;font-family:'Noto Serif TC',serif;font-size:1rem;letter-spacing:0.2em;color:#fff;margin-bottom:4px">地支</div>
           <div style="writing-mode:vertical-rl;font-size:0.6rem;color:rgba(255,255,255,0.7);font-family:'Noto Sans Thai',sans-serif">แผ่นดิน</div>
         </td>
       </tr>
@@ -771,7 +880,7 @@ ${IS_SHARED_VIEW?"":buildActionRow(r.id)}
   <div class="stitle">วิเคราะห์ Day Master</div>
   <div style="display:flex;align-items:center;gap:14px;margin-bottom:17px;flex-wrap:wrap">
     <div class="el-circle bg-${dm.el}" style="width:64px;height:64px;border:2px solid ${EL_COLOR[dm.el]};flex-shrink:0">
-      <span style="font-family:'Noto Serif SC',serif;font-size:2rem;font-weight:700;color:${EL_COLOR[dm.el]}">${dm.zh}</span>
+      <span style="font-family:'Noto Serif TC',serif;font-size:2rem;font-weight:700;color:${EL_COLOR[dm.el]}">${dm.zh}</span>
     </div>
     <div>
       <div style="font-family:'Ma Shan Zheng',serif;font-size:1.35rem;color:var(--red)">${dm.thaiEl}</div>
@@ -828,7 +937,7 @@ ${IS_SHARED_VIEW?"":buildActionRow(r.id)}
         </div>
         <div style="display:flex;align-items:flex-start;gap:14px">
           <div style="width:48px;height:48px;border-radius:50%;background:${EL_COLOR[compatInfo.good.el]};display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 10px ${EL_COLOR[compatInfo.good.el]}40">
-            <span style="font-family:'Noto Serif SC',serif;font-size:1.4rem;color:#fff;font-weight:700">${EL_ICON_CH[compatInfo.good.el]}</span>
+            <span style="font-family:'Noto Serif TC',serif;font-size:1.4rem;color:#fff;font-weight:700">${EL_ICON_CH[compatInfo.good.el]}</span>
           </div>
           <p style="font-size:0.86rem;color:#444;line-height:1.85;margin:0">${compatInfo.good.reason}</p>
         </div>
@@ -841,7 +950,7 @@ ${IS_SHARED_VIEW?"":buildActionRow(r.id)}
         </div>
         <div style="display:flex;align-items:flex-start;gap:14px">
           <div style="width:48px;height:48px;border-radius:50%;background:${EL_COLOR[compatInfo.bad.el]};display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 10px ${EL_COLOR[compatInfo.bad.el]}35">
-            <span style="font-family:'Noto Serif SC',serif;font-size:1.4rem;color:#fff;font-weight:700">${EL_ICON_CH[compatInfo.bad.el]}</span>
+            <span style="font-family:'Noto Serif TC',serif;font-size:1.4rem;color:#fff;font-weight:700">${EL_ICON_CH[compatInfo.bad.el]}</span>
           </div>
           <p style="font-size:0.86rem;color:#444;line-height:1.85;margin:0">${compatInfo.bad.reason}</p>
         </div>
@@ -896,7 +1005,7 @@ ${minor.length?`<div class="fu" style="margin-top:${major.length?"4px":"0"}"><di
       yaxis:{show:true,min:0,max:100,tickAmount:5, /* 5 ticks = 0,20,40,60,80,100 */
         labels:{show:false},
         stepSize:20},
-      xaxis:{labels:{style:{colors:["#3D7A4B","#C0392B","#9C7A2E","#8B7355","#2C5282"],fontSize:"13px",fontFamily:"Noto Sans Thai, Noto Sans SC"}}},
+      xaxis:{labels:{style:{colors:["#3D7A4B","#C0392B","#9C7A2E","#8B7355","#2C5282"],fontSize:"13px",fontFamily:"Noto Sans Thai, Noto Sans TC"}}},
       tooltip:{theme:"light",y:{formatter:v=>v+"%"}},
       theme:{mode:"light"}
     });
@@ -911,7 +1020,7 @@ function renderElBar(el,pct){
   return `<div class="el-bar" style="background:${color};border-radius:14px;margin-bottom:10px" onclick="scrollToElDetail('${el}')">
     <div class="el-bar-icon">
       <div style="width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-        <span style="font-family:'Noto Serif SC',serif;font-size:1.3rem;color:#fff;font-weight:700">${EL_ICON_CH[el]}</span>
+        <span style="font-family:'Noto Serif TC',serif;font-size:1.3rem;color:#fff;font-weight:700">${EL_ICON_CH[el]}</span>
       </div>
     </div>
     <span class="el-bar-name">ธาตุ${EL_THAI[el]}</span>
@@ -924,7 +1033,7 @@ function renderElBarMinor(el,pct){
   return `<div class="el-bar" style="background:${EL_BG[el]};border:1.5px solid ${color}35;border-radius:14px;margin-bottom:10px" onclick="scrollToElDetail('${el}')">
     <div class="el-bar-icon">
       <div style="width:42px;height:42px;border-radius:50%;background:${color}18;border:1.5px solid ${color}40;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-        <span style="font-family:'Noto Serif SC',serif;font-size:1.3rem;color:${color};font-weight:700">${EL_ICON_CH[el]}</span>
+        <span style="font-family:'Noto Serif TC',serif;font-size:1.3rem;color:${color};font-weight:700">${EL_ICON_CH[el]}</span>
       </div>
     </div>
     <span class="el-bar-name" style="color:${color}">ธาตุ${EL_THAI[el]}</span>
@@ -944,7 +1053,7 @@ function renderElAcc(el,pct,isMajor){
   return `<div class="acc" style="border-color:${color}40;margin-bottom:9px" id="el-detail-${el}">
     <div class="acc-h" onclick="toggleAcc(this)">
       <span class="acc-t">
-        <span style="width:30px;height:30px;border-radius:8px;background:${bg};border:1.5px solid ${color}30;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif SC',serif;font-size:1.1rem;color:${color}">${EL_ICON_CH[el]}</span>
+        <span style="width:30px;height:30px;border-radius:8px;background:${bg};border:1.5px solid ${color}30;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif TC',serif;font-size:1.1rem;color:${color}">${EL_ICON_CH[el]}</span>
         <span style="color:${color}">ธาตุ${EL_THAI[el]}</span>
         <span style="font-size:0.77rem;color:var(--gray-lt)">${pct}%</span>
         ${isMajor?`<span style="font-size:0.64rem;background:${color}12;color:${color};padding:2px 9px;border-radius:9px;border:1px solid ${color}28;font-weight:700">ธาตุหลัก</span>`:""}
@@ -988,171 +1097,76 @@ function toggleAcc(hdr){
   b.classList.toggle("open");c.classList.toggle("open");
 }
 
-/* ── LOCAL STORAGE ──────────────────────────────── */
-function saveLocal(r){try{let h=getLocal().filter(x=>x.id!==r.id);h.unshift(r);if(h.length>300)h=h.slice(0,300);localStorage.setItem("baziHistory",JSON.stringify(h));}catch(e){}}
-function getLocal(){try{return JSON.parse(localStorage.getItem("baziHistory")||"[]");}catch(e){return[];}}
-function delLocal(id){try{localStorage.setItem("baziHistory",JSON.stringify(getLocal().filter(r=>r.id!==id)));}catch(e){}}
-
-/* ── GAS FUNCTIONS ──────────────────────────────── */
-async function saveGAS(r){
-  if(!hasGas())return;
-  const url=getGasUrl();
-  // Use text/plain to avoid CORS preflight - GAS accepts this
-  try{
-    await fetch(url,{
-      method:"POST",
-      headers:{"Content-Type":"text/plain;charset=utf-8"},
-      body:JSON.stringify({action:"saveResult",data:r})
-    });
-  }catch(e){
-    // Silent fail - GAS might have saved it anyway (no-cors fallback)
-    try{
-      navigator.sendBeacon(url,JSON.stringify({action:"saveResult",data:r}));
-    }catch(e2){}
+/* ── HISTORY: ดึงจาก GAS ตรงๆ ──────────────────── */
+async function loadHistory() {
+  setHistStatus("loading");
+  renderHistoryTable([], true);
+  try {
+    const data = await getHistoryFromGAS();
+    // cache ลง local เพื่อให้ viewHist ใช้ได้แบบ offline
+    data.forEach(r => { if(r && r.id) saveLocal(r); });
+    _lastHistData = data;
+    setHistStatus("ok", data.length);
+    renderHistoryTable(data, false);
+  } catch(e) {
+    setHistStatus("error");
+    // fallback: local cache
+    renderHistoryTable(getLocal(), false);
   }
 }
 
-// After saving to GAS, update the local history cache too
-function updateCacheWithRecord(r){
-  if(_historyCache){
-    const existing=_historyCache.findIndex(x=>x.id===r.id);
-    if(existing>=0) _historyCache[existing]=r;
-    else _historyCache.unshift(r);
-    _historyCache.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
-  }
+let _lastHistData = [];  // last fetched from GAS
+
+function filterHistory() {
+  renderHistoryTable(_lastHistData, false);
 }
 
-async function delGAS(id){
-  if(!hasGas())return;
-  const url=getGasUrl();
-  try{await fetch(url,{method:"POST",mode:"no-cors",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({action:"deleteResult",id})});}catch(e){}
+function setHistStatus(state, count) {
+  const el = document.getElementById("hist-sync-status");
+  if (!el) return;
+  const map = {
+    loading: `<span style="color:#B5281C">⏳ กำลังโหลดจาก Google Sheets...</span>`,
+    ok:      `<span style="color:#2e7d32">✅ โหลดแล้ว — ${count} รายการ</span>`,
+    error:   `<span style="color:#888">⚠️ โหลดไม่สำเร็จ กด "โหลดใหม่" เพื่อลองอีกครั้ง</span>`,
+  };
+  el.innerHTML = map[state] || "";
 }
 
-async function getFromGAS(id){
-  if(!hasGas())return null;
-  const url=getGasUrl();
-  try{
-    // GET with cache-busting
-    const res=await fetch(
-      url+"?action=getResult&id="+encodeURIComponent(id)+"&t="+Date.now(),
-      {method:"GET",cache:"no-store"}
-    );
-    if(!res.ok)return null;
-    const text=await res.text();
-    if(!text||text==="null")return null;
-    const data=JSON.parse(text);
-    // Validate: must have id and bazi fields
-    return (data&&data.id&&data.bazi)?data:null;
-  }catch(e){
-    console.warn("getFromGAS error:",e.message);
-    return null;
-  }
-}
+function renderHistoryTable(data, loading) {
+  const q     = (document.getElementById("hist-search")?.value || "").toLowerCase();
+  const hist  = (data || []).filter(r => r.name?.toLowerCase().includes(q));
+  const total = hist.length;
+  const pages = Math.ceil(total / PER_PAGE) || 1;
+  if (histPage > pages) histPage = 1;
+  const slice = hist.slice((histPage - 1) * PER_PAGE, histPage * PER_PAGE);
+  const tb    = document.getElementById("hist-tbody");
 
-async function getHistoryFromGAS(){
-  if(!hasGas())return [];
-  const url=getGasUrl();
-  try{
-    const res=await fetch(url+"?action=getHistory&t="+Date.now(),{method:"GET",cache:"no-store"});
-    if(!res.ok)return [];
-    const data=await res.json();
-    return Array.isArray(data)?data:[];
-  }catch(e){return [];}
-}
-
-
-
-/* ── RECENT ─────────────────────────────────────── */
-function renderRecent(){
-  const hist=(_historyCache||getLocal()).slice(0,6);
-  const sec=document.getElementById("recent-section"),list=document.getElementById("recent-list");
-  if(!hist.length){sec.style.display="none";return;}
-  sec.style.display="block";
-  list.innerHTML=hist.map(r=>{
-    const el=r.bazi?.dayStem?.el||"water",col=EL_COLOR[el];
-    return `<button class="recent-btn" style="border-color:${col}35" onclick="viewHist('${r.id}')"
-      onmouseover="this.style.borderColor='${col}';this.style.background='${col}08'"
-      onmouseout="this.style.borderColor='${col}35';this.style.background='#fff'">
-      <span class="recent-btn-zh" style="color:${col}">${r.bazi?.dayStem?.zh||"?"}</span>${esc(r.name)}
-    </button>`;
-  }).join("");
-}
-
-/* ── HISTORY ────────────────────────────────────── */
-/* ── HISTORY: merge local + GAS ───────────────────── */
-let _historyCache=null;      // merged cache
-let _historyFetching=false;  // prevent double-fetch
-
-function mergeHistory(local, gas){
-  // Union by id, GAS data wins on conflict (newer/more complete)
-  const map=new Map();
-  local.forEach(r=>map.set(r.id,r));
-  gas.forEach(r=>{ if(r&&r.id) map.set(r.id,r); });
-  return [...map.values()].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
-}
-
-async function syncHistoryFromGAS(){
-  if(!hasGas()||_historyFetching)return;
-  _historyFetching=true;
-  setHistSyncStatus("loading");
-  try{
-    const gasData=await getHistoryFromGAS();
-    if(gasData&&gasData.length>0){
-      // Cache all GAS records locally
-      gasData.forEach(r=>{ if(r&&r.id) saveLocal(r); });
-      _historyCache=mergeHistory(getLocal(),gasData);
-    }else{
-      _historyCache=getLocal();
-    }
-    setHistSyncStatus("ok",(_historyCache||[]).length);
-  }catch(e){
-    _historyCache=getLocal();
-    setHistSyncStatus("error");
-  }finally{
-    _historyFetching=false;
-    renderHistoryTable();
-  }
-}
-
-function setHistSyncStatus(state, count){
-  const el=document.getElementById("hist-sync-status");
-  if(!el)return;
-  if(state==="loading") el.innerHTML=`<span style="color:#B5281C">⏳ กำลังดึงข้อมูลจาก GAS...</span>`;
-  else if(state==="ok")  el.innerHTML=`<span style="color:#2e7d32">✅ ซิงค์แล้ว — ทั้งหมด ${count} รายการ</span>`;
-  else if(state==="error") el.innerHTML=`<span style="color:#888">⚠️ ไม่สามารถดึงจาก GAS — แสดงเฉพาะข้อมูลในเครื่อง</span>`;
-}
-
-function renderHistory(){
-  // First render with local data immediately (fast)
-  if(!_historyCache) _historyCache=getLocal();
-  renderHistoryTable();
-  // Then sync from GAS in background
-  syncHistoryFromGAS();
-}
-
-function renderHistoryTable(){
-  const q=(document.getElementById("hist-search")?.value||"").toLowerCase();
-  const allHist=(_historyCache||getLocal());
-  const hist=allHist.filter(r=>r.name?.toLowerCase().includes(q));
-  const total=hist.length,pages=Math.ceil(total/PER_PAGE)||1;
-  if(histPage>pages)histPage=1;
-  const slice=hist.slice((histPage-1)*PER_PAGE,histPage*PER_PAGE);
-  const tb=document.getElementById("hist-tbody");
-  if(!total){
-    tb.innerHTML=`<tr><td colspan="5" style="text-align:center;padding:40px;color:#bbb">
-      ${_historyFetching?"⏳ กำลังโหลด...":"ยังไม่มีประวัติการดูดวง"}
+  if (loading) {
+    tb.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:#B5281C">
+      <div style="font-size:1.5rem;margin-bottom:8px">⏳</div>กำลังโหลดจาก Google Sheets...
     </td></tr>`;
-  }else{
-    tb.innerHTML=slice.map((r,i)=>{
-      const idx=(histPage-1)*PER_PAGE+i+1,el=r.bazi?.dayStem?.el||"water";
-      const dt=new Date(r.createdAt).toLocaleDateString("th-TH",{year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+    return;
+  }
+
+  if (!total) {
+    tb.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:#bbb">
+      ยังไม่มีประวัติการดูดวง
+    </td></tr>`;
+  } else {
+    tb.innerHTML = slice.map((r, i) => {
+      const idx = (histPage - 1) * PER_PAGE + i + 1;
+      const el  = r.bazi?.dayStem?.el || "water";
+      const dt  = new Date(r.createdAt).toLocaleDateString("th-TH", {
+        year:"numeric", month:"short", day:"numeric", hour:"2-digit", minute:"2-digit"
+      });
       return `<tr>
         <td style="color:#bbb;font-size:0.78rem">${idx}</td>
         <td style="color:var(--gray);font-size:0.82rem">${dt}</td>
-        <td><div class="hn">${esc(r.name)}</div><div class="he" style="color:${EL_COLOR[el]}">${EL_ICON[el]} ${r.bazi?.dayStem?.thaiEl||""}</div></td>
-        <td style="font-size:0.77rem;color:var(--gray-lt)">${(r.tags||[]).join(", ")}</td>
+        <td>
+          <div class="hn">${esc(r.name)}</div>
+          <div class="he" style="color:${EL_COLOR[el]}">${EL_ICON[el]} ${r.bazi?.dayStem?.thaiEl || ""}</div>
+        </td>
+        <td style="font-size:0.77rem;color:var(--gray-lt)">${(r.tags || []).join(", ")}</td>
         <td>
           <button class="hbtn hbv" onclick="viewHist('${r.id}')">ดูผล</button>
           <button class="hbtn hbd" onclick="delHist('${r.id}')">ลบ</button>
@@ -1160,18 +1174,110 @@ function renderHistoryTable(){
       </tr>`;
     }).join("");
   }
-  document.getElementById("hist-count").textContent=total?"ทั้งหมด "+total+" รายการ":"";
-  const pw=document.getElementById("pagination-wrap");
-  if(pages<=1){pw.innerHTML="";return;}
-  pw.innerHTML=`<div class="pagination">${Array.from({length:pages},(_,i)=>
-    `<button class="pgbtn${i+1===histPage?" active":""}" onclick="histPage=${i+1};renderHistoryTable()">${i+1}</button>`
+
+  document.getElementById("hist-count").textContent = total ? "ทั้งหมด " + total + " รายการ" : "";
+  const pw = document.getElementById("pagination-wrap");
+  if (pages <= 1) { pw.innerHTML = ""; return; }
+  pw.innerHTML = `<div class="pagination">${Array.from({ length: pages }, (_, i) =>
+    `<button class="pgbtn${i+1===histPage?" active":""}" onclick="histPage=${i+1};renderHistoryTable(_lastHistData,false)">${i+1}</button>`
   ).join("")}</div>`;
 }
-function viewHist(id){const r=getLocal().find(x=>x.id===id);if(!r)return toast2("error","ไม่พบข้อมูล");currentResult=r;renderResult(r);goPage("result");}
-function delHist(id){Swal.fire({title:"<span style=\"color:var(--red)\">ยืนยันการลบ?</span>",html:"<span style=\"color:#888\">ข้อมูลจะถูกลบออกถาวร</span>",icon:"warning",showCancelButton:true,confirmButtonText:"ลบ",cancelButtonText:"ยกเลิก",confirmButtonColor:"#B5281C",background:"#fff",customClass:{popup:"swal-cn"}}).then(res=>{if(res.isConfirmed){delLocal(id);delGAS(id).catch(()=>{});_historyCache=null;syncHistoryFromGAS();toast2("success","ลบข้อมูลแล้ว");}});}
 
-/* ── SHARE ──────────────────────────────────────── */
-function shareLink(id){const url=window.location.origin+window.location.pathname+"?id="+id;if(navigator.share)navigator.share({title:"Soul Element",url}).catch(()=>{});else navigator.clipboard.writeText(url).then(()=>toast2("success","คัดลอกลิงก์แล้ว!")).catch(()=>toast2("error","คัดลอกไม่สำเร็จ"));}
+/* ─ ดูผล: ตรวจ local cache ก่อน ถ้าไม่มีดึง GAS ─── */
+async function viewHist(id) {
+  // 1. ตรวจ local cache (เร็ว)
+  let r = getLocal().find(x => x.id === id);
+  if (r) { currentResult = r; renderResult(r); goPage("result"); return; }
+  // 2. ดึง GAS
+  Swal.fire({ title:`<span style="color:#B5281C">กำลังโหลด...</span>`,
+    allowOutsideClick:false, showConfirmButton:false, background:"#fff",
+    customClass:{popup:"swal-cn"}, didOpen:()=>Swal.showLoading() });
+  r = await getResultFromGAS(id);
+  Swal.close();
+  if (r) { saveLocal(r); currentResult = r; renderResult(r); goPage("result"); }
+  else toast2("error", "ไม่พบข้อมูล");
+}
+
+async function delHist(id) {
+  const conf = await Swal.fire({
+    title:`<span style="color:#B5281C">ยืนยันการลบ?</span>`,
+    html:`<span style="color:#888">ข้อมูลจะถูกลบออกจาก Google Sheets ถาวร</span>`,
+    icon:"warning", showCancelButton:true,
+    confirmButtonText:"ลบ", cancelButtonText:"ยกเลิก",
+    confirmButtonColor:"#B5281C", background:"#fff",
+    customClass:{popup:"swal-cn"}
+  });
+  if (!conf.isConfirmed) return;
+  delLocal(id);
+  await deleteFromGAS(id);
+  toast2("success", "ลบข้อมูลแล้ว");
+  loadHistory(); // reload จาก GAS
+}
+
+/* ── RECENT (home page) ──────────────────────────── */
+async function loadRecent() {
+  const sec  = document.getElementById("recent-section");
+  const list = document.getElementById("recent-list");
+  // ใช้ local cache ก่อน (เร็ว)
+  const cached = getLocal().slice(0, 6);
+  if (!cached.length) { sec.style.display = "none"; return; }
+  sec.style.display = "block";
+  list.innerHTML = cached.map(r => {
+    const el = r.bazi?.dayStem?.el || "water", col = EL_COLOR[el];
+    return `<button class="recent-btn" style="border-color:${col}35" onclick="viewHist('${r.id}')"
+      onmouseover="this.style.borderColor='${col}';this.style.background='${col}08'"
+      onmouseout="this.style.borderColor='${col}35';this.style.background='#fff'">
+      <span class="recent-btn-zh" style="color:${col}">${r.bazi?.dayStem?.zh || "?"}</span>${esc(r.name)}
+    </button>`;
+  }).join("");
+}
+
+/* ── CALCULATE (save to GAS immediately) ─────────── */
+function calculate() {
+  const name    = document.getElementById("inp-name").value.trim();
+  const dateVal = document.getElementById("inp-date").value;
+  const timeVal = document.getElementById("inp-time").value;
+  const noTime  = document.getElementById("no-time").checked;
+  const gender  = document.getElementById("inp-gender").value;
+  const tags    = [...document.querySelectorAll(".tc.sel")].map(c => c.textContent.trim());
+  if (!name)    return toast2("error", "กรุณากรอกชื่อ-นามสกุล");
+  if (!dateVal) return toast2("error", "กรุณาเลือกวันเกิด");
+  const [year, month, day] = dateVal.split("-").map(Number);
+  let hour = 12;
+  if (!noTime && timeVal) hour = parseInt(timeVal.split(":")[0], 10);
+
+  Swal.fire({
+    title: `<span style="font-family:'Ma Shan Zheng',serif;color:#B5281C">กำลังคำนวณดวง...</span>`,
+    html:  `<div style="color:#888;font-size:0.84rem">ประมวลผลสี่เสาหลัก 四柱命理</div>`,
+    allowOutsideClick: false, showConfirmButton: false, background: "#fff",
+    customClass: { popup: "swal-cn" }, didOpen: () => Swal.showLoading()
+  });
+
+  setTimeout(async () => {
+    const bazi      = calcBazi(year, month, day, hour, !noTime);
+    const { pct }   = calcElements(bazi, !noTime);
+    const createdAt = Date.now();
+    const expireAt  = createdAt + 7 * 24 * 60 * 60 * 1000;
+    const id        = "be-" + createdAt;
+    const result    = { id, name, dateVal, timeVal: noTime ? null : timeVal,
+                        gender, tags, bazi, pct, createdAt, expireAt, noTime };
+    currentResult = result;
+    saveLocal(result);        // cache ใน browser
+    saveToGAS(result);        // บันทึก GAS (async fire-and-forget)
+    Swal.close();
+    renderResult(result);
+    goPage("result");
+  }, 700);
+}
+
+/* ── SHARE LINK ──────────────────────────────────── */
+function shareLink(id) {
+  const url = window.location.origin + window.location.pathname + "?id=" + id;
+  if (navigator.share) navigator.share({ title: "Soul Element", url }).catch(() => {});
+  else navigator.clipboard.writeText(url)
+    .then(() => toast2("success", "คัดลอกลิงก์แล้ว!"))
+    .catch(() => toast2("error", "คัดลอกไม่สำเร็จ"));
+}
 
 /* ── QR ─────────────────────────────────────────── */
 function openQr(){if(!currentResult)return;document.getElementById("qr-modal").classList.add("open");setTimeout(()=>drawSlip(currentResult),80);}
@@ -1206,21 +1312,18 @@ function drawSlip(r){
 }
 function downloadSlip(){const c=document.getElementById("slip-canvas"),a=document.createElement("a");a.href=c.toDataURL("image/png");a.download="soul-element-slip.png";a.click();}
 
-/* ── SHARED LINK ────────────────────────────────── */
-function hideActionRowForShared(){
-  setTimeout(()=>{
-    // Hide ALL action/navigation elements in shared view
-    document.querySelectorAll(".action-row,.no-print,.cdown").forEach(el=>{
-      if(el)el.style.display="none";
-    });
-    // Hide countdown bar specifically
-    const cd=document.getElementById("ctimer");
-    if(cd)cd.closest(".cdown")?.remove();
-  },300);
-}
 
-/* ── IS SHARED VIEW? ──────────────────────────────── */
-const IS_SHARED_VIEW = !!new URLSearchParams(window.location.search).get("id");
+
+
+
+
+
+
+
+
+
+
+/* ── SHARED VIEW FUNCTIONS ──────────────────────────── */
 
 function applySharedViewMode(){
   // Hide entire navbar
@@ -1263,7 +1366,7 @@ async function checkSharedLink(){
   // Show loading in result area
   document.getElementById("result-wrap").innerHTML=`
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px">
-      <div style="font-size:3rem;font-family:'Noto Serif SC',serif;color:#B5281C">命</div>
+      <div style="font-size:3rem;font-family:'Noto Serif TC',serif;color:#B5281C">命</div>
       <div style="font-size:1rem;color:#888;font-family:'Noto Sans Thai',sans-serif">กำลังโหลดผลดูดวง...</div>
       <div style="width:40px;height:40px;border:3px solid #f0e8e8;border-top-color:#B5281C;border-radius:50%;animation:spin360 0.8s linear infinite"></div>
     </div>`;
@@ -1390,12 +1493,12 @@ function drawShareCard(r){
 
   // ── ELEMENT TITLE ─────────────────────────────────────
   ctx.fillStyle="rgba(255,255,255,0.95)";
-  ctx.font="bold 22px 'Noto Serif SC','Noto Sans SC',serif";
+  ctx.font="bold 22px 'Noto Serif TC','Noto Sans TC',serif";
   ctx.textAlign="center";
   ctx.fillText("ธาตุ"+EL_THAI[dm?.el||"water"]+(dm?.pol==="yang"?"หยาง":"หยิน"),W/2-20,58);
   
   // Chinese character next to title
-  ctx.font="bold 28px 'Noto Serif SC',serif";
+  ctx.font="bold 28px 'Noto Serif TC',serif";
   ctx.fillStyle="rgba(255,255,255,0.9)";
   ctx.fillText(dm?.zh||"壬", W/2+80, 58);
 
@@ -1415,15 +1518,15 @@ function drawShareCard(r){
   const [yr,mo,dy]=((r.dateVal||"2000-01-01")).split("-").map(Number);
   // Month column
   ctx.fillStyle="rgba(255,255,255,0.9)";
-  ctx.font="bold 13px 'Noto Sans SC',sans-serif";
+  ctx.font="bold 13px 'Noto Sans TC',sans-serif";
   ctx.textAlign="center";
   ctx.fillText(mo,W-38,115);
   ctx.font="12px 'Noto Sans Thai',sans-serif";
   ctx.fillText("月",W-38,132);
   // Day column
-  ctx.font="bold 28px 'Noto Serif SC',serif";
+  ctx.font="bold 28px 'Noto Serif TC',serif";
   ctx.fillText(dy,W-38,168);
-  ctx.font="12px 'Noto Sans SC',sans-serif";
+  ctx.font="12px 'Noto Sans TC',sans-serif";
   ctx.fillText("日",W-38,184);
   if(r.timeVal){
     ctx.font="11px 'Noto Sans Thai',sans-serif";
@@ -1469,7 +1572,7 @@ function drawShareCard(r){
   ctx.fillText("ปีนักษัตร: "+animal,20,295);
   ctx.textAlign="center";
   ctx.fillStyle=elColor;
-  ctx.font="bold 13px 'Noto Serif SC',serif";
+  ctx.font="bold 13px 'Noto Serif TC',serif";
   ctx.fillText("星期"+["日","一","二","三","四","五","六"][dateObj.getDay()],W/2,295);
   ctx.fillStyle="#555";
   ctx.font="13px 'Noto Sans Thai',sans-serif";
@@ -1537,7 +1640,7 @@ function drawShareCard(r){
   // Good icon circle
   ctx.fillStyle=goodColor;
   ctx.beginPath();ctx.arc(182,compatY+33,18,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle="#fff";ctx.font="bold 14px 'Noto Serif SC',serif";ctx.textAlign="center";
+  ctx.fillStyle="#fff";ctx.font="bold 14px 'Noto Serif TC',serif";ctx.textAlign="center";
   ctx.fillText(EL_ICON_CH[compat?.good?.el||"fire"],182,compatY+38);
 
   // Bad card
@@ -1557,7 +1660,7 @@ function drawShareCard(r){
   // Bad icon circle
   ctx.fillStyle=badColor;
   ctx.beginPath();ctx.arc(389,compatY+33,18,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle="#fff";ctx.font="bold 14px 'Noto Serif SC',serif";ctx.textAlign="center";
+  ctx.fillStyle="#fff";ctx.font="bold 14px 'Noto Serif TC',serif";ctx.textAlign="center";
   ctx.fillText(EL_ICON_CH[compat?.bad?.el||"earth"],389,compatY+38);
 
   // ── WATERMARK ─────────────────────────────────────────
@@ -1591,144 +1694,100 @@ function roundRect(ctx,x,y,w,h,r,fill,stroke){
   if(stroke)ctx.stroke();
 }
 
+/* ── RENDER PILLAR ──────────────────────────────── */
+function renderPillar(p){
+  const s=p.stem,b=p.branch;
+  return `<td style="padding:16px 10px;text-align:center;border-right:1px solid #f0e8e8;border-top:1px solid #e8d8d8;background:${p.isDay?"#FEF0EE":"#fff"};vertical-align:middle">
+    <div style="width:50px;height:50px;border-radius:50%;background:${EL_COLOR[s.el]}18;border:2px solid ${EL_COLOR[s.el]}60;margin:0 auto 10px;display:flex;align-items:center;justify-content:center">
+      <span style="font-family:'Noto Serif TC',serif;font-size:1.5rem;font-weight:700;color:${EL_COLOR[s.el]}">${s.zh}</span>
+    </div>
+    <div style="font-family:'Noto Serif TC',serif;font-size:1.1rem;font-weight:700;color:${EL_COLOR[s.el]};margin-bottom:3px">${s.zh} <span style="font-size:0.85rem;font-style:italic;color:#888">${s.py}</span></div>
+    <div style="font-size:0.74rem;color:#777">${s.thaiEl}</div>
+    <div style="height:1px;background:#f0e8e8;margin:10px 0"></div>
+    <div style="width:44px;height:44px;border-radius:10px;background:${EL_COLOR[b.el]}15;border:2px solid ${EL_COLOR[b.el]}50;margin:0 auto 8px;display:flex;align-items:center;justify-content:center">
+      <span style="font-family:'Noto Serif TC',serif;font-size:1.3rem;font-weight:700;color:${EL_COLOR[b.el]}">${b.zh}</span>
+    </div>
+    <div style="font-family:'Noto Serif TC',serif;font-size:1rem;font-weight:700;color:${EL_COLOR[b.el]};margin-bottom:3px">${b.zh} <span style="font-size:0.82rem;font-style:italic;color:#888">${b.py}</span></div>
+    <div style="font-size:0.72rem;color:#777">${elThaiName(b.el)}${b.pol==="yang"?"หยาง":"หยิน"}·${b.animal}</div>
+  </td>`;
+}
+
+/* ── HIDE ACTION ROW (SHARED) ───────────────────── */
+function hideActionRowForShared(){
+  setTimeout(()=>{
+    document.querySelectorAll(".action-row,.no-print,.cdown").forEach(el=>{
+      if(el)el.style.display="none";
+    });
+  },300);
+}
+
 /* ── SETTINGS FUNCTIONS ─────────────────────────── */
 function openSettings(){
   const modal=document.getElementById("settings-modal");
-  modal.classList.add("open");
+  if(modal)modal.classList.add("open");
   const input=document.getElementById("gas-url-input");
-  input.value=getGasUrl();
+  if(input)input.value=localStorage.getItem("soulElementGasUrl")||GAS_URL;
   updateCurrentGasStatus();
 }
-function closeSettings(){document.getElementById("settings-modal").classList.remove("open");}
-
+function closeSettings(){
+  const m=document.getElementById("settings-modal");
+  if(m)m.classList.remove("open");
+}
 function updateCurrentGasStatus(){
   const el=document.getElementById("current-gas-status");
   if(!el)return;
-  const url=getGasUrl();
-  if(url&&url.startsWith("https://")){
-    el.innerHTML=`<span style="color:#2e7d32">✅ ตั้งค่าแล้ว</span><br><span style="color:#999;font-size:0.75rem;word-break:break-all">${url.substring(0,60)}...</span>`;
-  }else{
-    el.innerHTML=`<span style="color:#B5281C">❌ ยังไม่ได้ตั้งค่า GAS URL</span><br><span style="color:#999;font-size:0.75rem">ข้อมูลจะบันทึกเฉพาะใน Browser นี้เท่านั้น</span>`;
-  }
+  const url=localStorage.getItem("soulElementGasUrl")||GAS_URL;
+  el.innerHTML=url&&url.startsWith("https://")
+    ?`<span style="color:#2e7d32">✅ ตั้งค่าแล้ว</span><br><span style="color:#999;font-size:0.75rem;word-break:break-all">${url.substring(0,70)}...</span>`
+    :`<span style="color:#B5281C">❌ ยังไม่ได้ตั้งค่า</span>`;
 }
-
 function saveGasUrl(){
-  const val=document.getElementById("gas-url-input").value.trim();
+  const val=document.getElementById("gas-url-input")?.value.trim();
   const statusEl=document.getElementById("gas-status");
-  if(!val){
-    statusEl.innerHTML="<span style='color:#B5281C'>กรุณากรอก URL</span>";return;
-  }
+  if(!val){if(statusEl)statusEl.innerHTML="<span style='color:#B5281C'>กรุณากรอก URL</span>";return;}
   if(!val.startsWith("https://script.google.com")){
-    statusEl.innerHTML="<span style='color:#B5281C'>URL ต้องขึ้นต้นด้วย https://script.google.com</span>";return;
+    if(statusEl)statusEl.innerHTML="<span style='color:#B5281C'>URL ต้องขึ้นต้นด้วย https://script.google.com</span>";return;
   }
-  setGasUrl(val);
-  statusEl.innerHTML="<span style='color:#2e7d32'>✅ บันทึก URL สำเร็จ!</span>";
+  localStorage.setItem("soulElementGasUrl",val);
+  if(statusEl)statusEl.innerHTML="<span style='color:#2e7d32'>✅ บันทึกสำเร็จ!</span>";
   updateCurrentGasStatus();
   setTimeout(()=>closeSettings(),1200);
 }
-
 async function testGasUrl(){
-  const val=document.getElementById("gas-url-input").value.trim();
+  const val=document.getElementById("gas-url-input")?.value.trim();
   const statusEl=document.getElementById("gas-status");
-  if(!val){statusEl.innerHTML="<span style='color:#B5281C'>กรุณากรอก URL ก่อน</span>";return;}
-  statusEl.innerHTML="<span style='color:#888'>⏳ กำลังทดสอบ...</span>";
+  if(!val){if(statusEl)statusEl.innerHTML="<span style='color:#B5281C'>กรุณากรอก URL ก่อน</span>";return;}
+  if(statusEl)statusEl.innerHTML="<span style='color:#888'>⏳ กำลังทดสอบ...</span>";
   try{
-    const res=await fetch(val+"?action=ping&nocache="+Date.now(),{method:"GET"});
+    const res=await fetch(val+"?action=ping&t="+Date.now(),{method:"GET"});
+    if(!statusEl)return;
     if(res.ok){
       const txt=await res.text();
-      if(txt.includes("pong")||txt.includes("ok")||txt.includes("{")){
-        statusEl.innerHTML="<span style='color:#2e7d32'>✅ เชื่อมต่อสำเร็จ! GAS พร้อมใช้งาน</span>";
-      }else{
-        statusEl.innerHTML="<span style='color:#FF8C00'>⚠️ เชื่อมต่อได้แต่ response ผิดปกติ ลองบันทึกและใช้งานได้เลย</span>";
-      }
+      statusEl.innerHTML=(txt.includes("pong")||txt.includes("{"))
+        ?"<span style='color:#2e7d32'>✅ เชื่อมต่อสำเร็จ!</span>"
+        :"<span style='color:#FF8C00'>⚠️ response ผิดปกติ ลองบันทึกได้เลย</span>";
     }else{
-      statusEl.innerHTML=`<span style='color:#B5281C'>❌ เชื่อมต่อไม่ได้ (status ${res.status})</span>`;
+      statusEl.innerHTML=`<span style='color:#B5281C'>❌ status ${res.status}</span>`;
     }
   }catch(e){
-    statusEl.innerHTML=`<span style='color:#B5281C'>❌ ${e.message.includes("CORS")?"CORS error — GAS ต้องตั้งค่า Access: Anyone":e.message}</span>`;
+    if(statusEl)statusEl.innerHTML=`<span style='color:#B5281C'>❌ ${e.message}</span>`;
   }
 }
 
-/* ── INIT ───────────────────────────────────────── */
-document.addEventListener("DOMContentLoaded",()=>{
-  // Version check: clear old incompatible data
-  const VER="v3";
-  if(localStorage.getItem("baziVer")!==VER){
+/* ── INIT ──────────────────────────────────────── */
+document.addEventListener("DOMContentLoaded", () => {
+  const VER = "v4-gas";
+  if (localStorage.getItem("baziVer") !== VER) {
     localStorage.removeItem("baziHistory");
-    localStorage.setItem("baziVer",VER);
+    localStorage.removeItem("baziCache");
+    localStorage.setItem("baziVer", VER);
   }
-  document.getElementById("inp-date").valueAsDate=new Date();
-  if(!IS_SHARED_VIEW){
+  const dateEl = document.getElementById("inp-date"); if(dateEl) dateEl.valueAsDate = new Date();
+  if (!IS_SHARED_VIEW) {
     goPage("home");
   }
-  // checkSharedLink is async - call it properly
-  checkSharedLink().catch(()=>{});
-  // Show GAS config reminder if not set and no ?id param
-  const hasId=new URLSearchParams(window.location.search).get("id");
-  if(!hasGas()&&!hasId){
-    // Show subtle indicator in home page
-    const gasHint=document.createElement("div");
-    gasHint.style.cssText="text-align:center;margin-top:14px;font-size:0.78rem;color:#bbb";
-    gasHint.innerHTML=`<span>⚙ GAS ยังไม่ได้ตั้งค่า — ข้อมูลจะไม่ sync ข้าม Browser 
-      <button onclick="openSettings()" style="color:#B5281C;background:none;border:none;cursor:pointer;font-size:0.78rem;font-weight:700;text-decoration:underline">ตั้งค่าเลย</button></span>`;
-    document.getElementById("recent-section")?.parentElement?.appendChild(gasHint);
-  }
+  checkSharedLink().catch(() => {});
 });
 </script>
-
-
-<!-- SHARE CARD MODAL -->
-<div class="modal-ov" id="share-card-modal">
-  <div class="modal-box" style="width:420px;max-width:96vw">
-    <div class="modal-hdr">
-      <span class="modal-tit">📤 แชร์การ์ดดวงปาจื้อ</span>
-      <button class="modal-cls" onclick="closeShareCard()">✕</button>
-    </div>
-    <div class="modal-bdy" style="padding:16px">
-      <div id="share-card-preview" style="display:flex;justify-content:center;margin-bottom:14px">
-        <canvas id="share-canvas" style="border-radius:16px;max-width:100%;box-shadow:0 4px 20px rgba(0,0,0,0.15)"></canvas>
-      </div>
-      <p style="font-size:0.77rem;color:#999;text-align:center;margin-bottom:12px">กดบันทึกรูป แล้วแชร์ผ่าน LINE, Facebook หรือ Social Media</p>
-    </div>
-    <div class="modal-ftr">
-      <button class="bsm bsm-out" onclick="closeShareCard()">ปิด</button>
-      <button class="bsm bsm-red" onclick="downloadShareCard()">📥 บันทึกรูป</button>
-      <button class="bsm" style="background:#25D366;color:#fff;border:none" onclick="shareCardNative()">📤 แชร์</button>
-    </div>
-  </div>
-</div>
-
-<!-- SETTINGS MODAL -->
-<div class="modal-ov" id="settings-modal">
-  <div class="modal-box" style="width:480px">
-    <div class="modal-hdr">
-      <span class="modal-tit">⚙ ตั้งค่าระบบ GAS URL</span>
-      <button class="modal-cls" onclick="closeSettings()">✕</button>
-    </div>
-    <div class="modal-bdy" style="padding:24px">
-      <div style="font-size:0.82rem;color:#555;margin-bottom:16px;line-height:1.7;background:#fef9f5;border:1px solid #f0e0c0;border-radius:10px;padding:14px">
-        <b style="color:#B5281C">วิธีตั้งค่า:</b><br>
-        1. เปิด Google Apps Script → Deploy → Web App<br>
-        2. ตั้งค่า <b>Execute as: Me</b> และ <b>Access: Anyone</b><br>
-        3. คัดลอก URL ที่ได้มาวางด้านล่าง<br>
-        4. กด "บันทึก" เพื่อเริ่มใช้งาน
-      </div>
-      <label style="font-size:0.78rem;font-weight:700;color:#B5281C;letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:7px">Google Apps Script URL</label>
-      <input type="url" id="gas-url-input" placeholder="https://script.google.com/macros/s/.../exec"
-        style="width:100%;padding:11px 14px;border:1.5px solid #ddd;border-radius:9px;font-size:0.88rem;font-family:'Noto Sans Thai',sans-serif;outline:none;transition:border-color 0.2s"
-        onfocus="this.style.borderColor='#B5281C'" onblur="this.style.borderColor='#ddd'"/>
-      <div id="gas-status" style="margin-top:10px;font-size:0.8rem;min-height:20px"></div>
-      <div style="display:flex;gap:10px;margin-top:16px">
-        <button onclick="testGasUrl()" class="bsm bsm-out" style="flex:1">🔍 ทดสอบการเชื่อมต่อ</button>
-        <button onclick="saveGasUrl()" class="bsm bsm-red" style="flex:1">💾 บันทึก URL</button>
-      </div>
-      <div style="margin-top:20px;padding-top:16px;border-top:1px solid #f0e8e8">
-        <div style="font-size:0.75rem;font-weight:700;color:#888;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px">สถานะปัจจุบัน</div>
-        <div id="current-gas-status" style="font-size:0.83rem;color:#555"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
 </body>
 </html>
