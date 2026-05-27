@@ -305,6 +305,48 @@ body::before{content:"";position:fixed;inset:0;background-image:radial-gradient(
   </div>
 </div>
 
+
+<!-- EDIT MODAL -->
+<div class="modal-ov" id="edit-modal">
+  <div class="modal-box" style="width:500px">
+    <div class="modal-hdr">
+      <span class="modal-tit">✏️ แก้ไขข้อมูล</span>
+      <button class="modal-cls" onclick="closeEditModal()">✕</button>
+    </div>
+    <div class="modal-bdy" style="padding:24px">
+      <input type="hidden" id="edit-id"/>
+      <div class="fg"><label class="fl">ชื่อ - นามสกุล *</label>
+        <input type="text" id="edit-name" class="fi" placeholder="ชื่อ-นามสกุล"/>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="fg"><label class="fl">วันเกิด *</label>
+          <input type="date" id="edit-date" class="fi"/>
+        </div>
+        <div class="fg"><label class="fl">เวลาเกิด</label>
+          <input type="time" id="edit-time" class="fi"/>
+          <div class="cbrow">
+            <input type="checkbox" id="edit-no-time" onchange="document.getElementById('edit-time').disabled=this.checked;if(this.checked)document.getElementById('edit-time').value=''"/>
+            <label for="edit-no-time">ไม่ทราบเวลาเกิด</label>
+          </div>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">เพศ</label>
+        <select id="edit-gender" class="fi">
+          <option value="male">♂ ชาย</option>
+          <option value="female">♀ หญิง</option>
+        </select>
+      </div>
+      <div style="background:#fef9f0;border:1px solid #f59e0b40;border-radius:10px;padding:12px;font-size:0.82rem;color:#92400e;margin-top:4px">
+        ⚠️ หากแก้ไขวัน/เวลาเกิด ระบบจะคำนวณดวงใหม่โดยอัตโนมัติ
+      </div>
+    </div>
+    <div class="modal-ftr">
+      <button class="bsm bsm-out" onclick="closeEditModal()">ยกเลิก</button>
+      <button class="bsm bsm-red" onclick="saveEdit()">💾 บันทึกการแก้ไข</button>
+    </div>
+  </div>
+</div>
+
 <!-- SETTINGS MODAL -->
 <div class="modal-ov" id="settings-modal">
   <div class="modal-box" style="width:480px">
@@ -767,18 +809,6 @@ function renderResult(r){
   <div class="result-header-row">
     <div>
       <div class="result-name">${esc(r.name)}</div>
-      <div style="margin-bottom:8px">
-        ${(()=>{
-          const boost=[...sorted].sort((a,b)=>a.pct-b.pct)[0];
-          const elC=EL_COLOR[boost.el];
-          const elB=EL_BG[boost.el];
-          return `<span style="display:inline-flex;align-items:center;gap:7px;background:${elB};border:1.5px solid ${elC}40;border-radius:20px;padding:5px 14px;">
-            <span style="font-family:'Noto Serif TC','Noto Sans TC',serif;font-size:1rem;color:${elC};font-weight:700">${EL_ICON_CH[boost.el]}</span>
-            <span style="font-size:0.78rem;color:#555;font-weight:500">ธาตุที่ควรเสริม</span>
-            <span style="font-size:0.82rem;font-weight:700;color:${elC}">ธาตุ${EL_THAI[boost.el]} (${boost.pct}%)</span>
-          </span>`;
-        })()}
-      </div>
       <div class="result-meta">
         <span class="mi">📅 ${dStr}</span>
         ${!r.noTime?`<span class="mi">🕐 ${r.timeVal} น.</span>`:""}
@@ -862,7 +892,8 @@ ${IS_SHARED_VIEW?"":buildActionRow(r.id)}
       ธาตุส่งเสริม: <b style="color:${EL_COLOR[GENERATED_BY[dm.el]]}">${EL_THAI[GENERATED_BY[dm.el]]}</b> &nbsp;|&nbsp;
       ธาตุที่ควบคุม: <b style="color:${EL_COLOR[CONTROLS[dm.el]]}">${EL_THAI[CONTROLS[dm.el]]}</b> &nbsp;|&nbsp;
       ธาตุที่ขัดแย้ง: <b style="color:${EL_COLOR[CONTROLLED_BY[dm.el]]}">${EL_THAI[CONTROLLED_BY[dm.el]]}</b><br>
-      ธาตุมากสุดในดวง: <b style="color:${EL_COLOR[sorted[0].el]}">${EL_THAI[sorted[0].el]} (${sorted[0].pct}%)</b>
+      ธาตุมากสุดในดวง: <b style="color:${EL_COLOR[sorted[0].el]}">${EL_THAI[sorted[0].el]} (${sorted[0].pct}%)</b><br>
+      ธาตุที่ควรเสริม: <b style="color:${EL_COLOR[[...sorted].sort((a,b)=>a.pct-b.pct)[0].el]}">${EL_THAI[[...sorted].sort((a,b)=>a.pct-b.pct)[0].el]} (${[...sorted].sort((a,b)=>a.pct-b.pct)[0].pct}%)</b>
     </div>
   </div>
 </div>
@@ -871,8 +902,8 @@ ${IS_SHARED_VIEW?"":buildActionRow(r.id)}
 <div class="scard fu">
   <div class="stitle">วิเคราะห์ Day Master</div>
   <div style="display:flex;align-items:center;gap:14px;margin-bottom:17px;flex-wrap:wrap">
-    <div class="el-circle bg-${dm.el}" style="width:64px;height:64px;border:2px solid ${EL_COLOR[dm.el]};flex-shrink:0">
-      <span style="font-family:'Noto Serif TC',serif;font-size:2rem;font-weight:700;color:${EL_COLOR[dm.el]}">${dm.zh}</span>
+    <div style="width:64px;height:64px;border-radius:50%;background:${EL_COLOR[dm.el]}18;border:2.5px solid ${EL_COLOR[dm.el]};flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+      <span style="font-family:'Noto Serif TC',serif;font-size:1.9rem;font-weight:700;color:${EL_COLOR[dm.el]};line-height:1">${dm.zh}</span>
     </div>
     <div>
       <div style="font-family:'Ma Shan Zheng',serif;font-size:1.35rem;color:var(--red)">${dm.thaiEl}</div>
@@ -1175,6 +1206,7 @@ function renderHistoryTable(data, loading) {
         <td style="font-size:0.77rem;color:var(--gray-lt)">${(r.tags || []).join(", ")}</td>
         <td>
           <button class="hbtn hbv" onclick="viewHist('${r.id}')">ดูผล</button>
+          <button class="hbtn" style="border-color:#f59e0b;color:#b45309;background:#fef3c7;" onclick="editHist('${r.id}')">แก้ไข</button>
           <button class="hbtn hbd" onclick="delHist('${r.id}')">ลบ</button>
         </td>
       </tr>`;
@@ -1750,6 +1782,84 @@ function hideActionRowForShared(){
       if(el)el.style.display="none";
     });
   },300);
+}
+
+
+/* ── EDIT HISTORY RECORD ────────────────────────── */
+function openEditModal() { document.getElementById("edit-modal").classList.add("open"); }
+function closeEditModal() { document.getElementById("edit-modal").classList.remove("open"); }
+
+function editHist(id) {
+  // Load record from cache or local
+  const r = (_lastHistData.find(x=>x.id===id)) || getLocal().find(x=>x.id===id);
+  if (!r) return toast2("error", "ไม่พบข้อมูล");
+
+  // Fill form
+  document.getElementById("edit-id").value       = id;
+  document.getElementById("edit-name").value     = r.name || "";
+  document.getElementById("edit-date").value     = r.dateVal || "";
+  document.getElementById("edit-time").value     = r.timeVal || "12:00";
+  document.getElementById("edit-gender").value   = r.gender || "male";
+  const noTime = !r.timeVal || r.noTime;
+  document.getElementById("edit-no-time").checked = noTime;
+  document.getElementById("edit-time").disabled   = noTime;
+  openEditModal();
+}
+
+async function saveEdit() {
+  const id      = document.getElementById("edit-id").value;
+  const name    = document.getElementById("edit-name").value.trim();
+  const dateVal = document.getElementById("edit-date").value;
+  const noTime  = document.getElementById("edit-no-time").checked;
+  const timeVal = noTime ? null : document.getElementById("edit-time").value;
+  const gender  = document.getElementById("edit-gender").value;
+
+  if (!name)    return toast2("error", "กรุณากรอกชื่อ-นามสกุล");
+  if (!dateVal) return toast2("error", "กรุณาเลือกวันเกิด");
+
+  // Find original record
+  const orig = (_lastHistData.find(x=>x.id===id)) || getLocal().find(x=>x.id===id);
+  if (!orig) return toast2("error", "ไม่พบข้อมูลต้นฉบับ");
+
+  // Check if date/time changed → recalculate bazi
+  const dateChanged = orig.dateVal !== dateVal ||
+                      (orig.noTime !== noTime)  ||
+                      (!noTime && orig.timeVal !== timeVal);
+
+  let updated = { ...orig, name, dateVal, timeVal, noTime, gender };
+
+  if (dateChanged) {
+    const [year, month, day] = dateVal.split("-").map(Number);
+    let hour = 12;
+    if (!noTime && timeVal) hour = parseInt(timeVal.split(":")[0], 10);
+    const bazi = calcBazi(year, month, day, hour, !noTime);
+    const { pct } = calcElements(bazi, !noTime);
+    updated = { ...updated, bazi, pct };
+  }
+
+  // Save
+  closeEditModal();
+  Swal.fire({
+    title: `<span style="color:#B5281C;font-family:'Ma Shan Zheng',serif">กำลังบันทึก...</span>`,
+    allowOutsideClick: false, showConfirmButton: false, background: "#fff",
+    customClass: { popup: "swal-cn" }, didOpen: () => Swal.showLoading()
+  });
+
+  saveLocal(updated);
+  // Update _lastHistData cache
+  const idx = _lastHistData.findIndex(x => x.id === id);
+  if (idx >= 0) _lastHistData[idx] = updated;
+
+  await saveToGAS(updated);
+  Swal.close();
+  toast2("success", "บันทึกการแก้ไขแล้ว");
+
+  // If this is the currently displayed result, re-render
+  if (currentResult && currentResult.id === id) {
+    currentResult = updated;
+    renderResult(updated);
+  }
+  renderHistoryTable(_lastHistData, false);
 }
 
 /* ── SETTINGS FUNCTIONS ─────────────────────────── */
